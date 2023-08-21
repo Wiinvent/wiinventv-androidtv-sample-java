@@ -20,6 +20,8 @@ import com.example.sampleandroidtv.R;
 import com.example.sampleandroidtv.pojo.Movie;
 import com.example.sampleandroidtv.activity.DetailsActivity;
 import com.example.sampleandroidtv.ui.TV360SkipAdsButtonAds;
+import com.google.ads.interactivemedia.v3.api.FriendlyObstruction;
+import com.google.ads.interactivemedia.v3.api.FriendlyObstructionPurpose;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
@@ -29,6 +31,8 @@ import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import tv.wiinvent.androidtv.InStreamManager;
@@ -81,8 +85,18 @@ public class PlaybackVideoFragment extends Fragment {
   }
 
   private void initializePlayer() {
+    //khai bao friendly obstruction
+    List<FriendlyObstruction> friendlyObstructionList = new ArrayList<>();
+    FriendlyObstruction skipButtonObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
+      skipButton,
+        FriendlyObstructionPurpose.CLOSE_AD,
+        "This is close ad"
+    );
+
+    friendlyObstructionList.add(skipButtonObstruction);
+
     DataSource.Factory factory = new DefaultDataSource.Factory(requireActivity());
-    ImaAdsLoader adsLoader = InStreamManager.Companion.getInstance().getLoader();
+    ImaAdsLoader adsLoader = InStreamManager.Companion.getInstance().getLoader(friendlyObstructionList);
 
     MediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(factory)
         .setAdsLoaderProvider(unusedAdTagUri -> adsLoader)
