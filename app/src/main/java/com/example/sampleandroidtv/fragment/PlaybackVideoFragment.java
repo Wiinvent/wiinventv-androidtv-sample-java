@@ -109,7 +109,7 @@ public class PlaybackVideoFragment extends Fragment {
     String contentUrl = "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8";
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
         .channelId("998989")
-        .streamId("290")
+        .streamId("999999")
         .build();
 
     MediaItem mediaItem =
@@ -121,7 +121,7 @@ public class PlaybackVideoFragment extends Fragment {
     exoPlayer.setMediaItem(mediaItem);
     exoPlayer.prepare();
 
-    exoPlayer.setPlayWhenReady(false);
+    exoPlayer.setPlayWhenReady(true);
 
     InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
       @Override
