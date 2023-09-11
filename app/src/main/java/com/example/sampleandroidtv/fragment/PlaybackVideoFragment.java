@@ -144,7 +144,7 @@ public class PlaybackVideoFragment extends Fragment {
 
       @Override
       public void onTimeout() {
-
+        InStreamManager.Companion.getInstance().release();
       }
     });
   }
