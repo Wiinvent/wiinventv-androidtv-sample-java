@@ -1,5 +1,6 @@
 package com.example.sampleandroidtv.activity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -83,6 +84,9 @@ public class MainActivity extends FragmentActivity {
     R.id.welcome_ad_view,
         R.layout.wisdk_welcome_tvc_detail,
         R.id.wisdk_exo_player_view,
-        R.id.wisdk_skip_button);
+        R.id.wisdk_skip_button,
+        "Bỏ qua quảng cáo",
+        Color.parseColor("#28282A"),
+        R.drawable.next_black);
   }
 }

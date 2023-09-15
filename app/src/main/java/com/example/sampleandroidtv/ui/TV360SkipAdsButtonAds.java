@@ -1,6 +1,7 @@
 package com.example.sampleandroidtv.ui;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -34,5 +35,8 @@ public class TV360SkipAdsButtonAds extends SkipAdsButtonAds {
     if(getSkipButton() != null) {
       getSkipButton().setOnClickListener((View.OnClickListener) this);
     }
+    setSkipLabel("Bỏ qua quảng cáo");
+    setIconDrawable( R.drawable.next_black);
+    setColorTextSelected(Color.parseColor("#28282A"));
   }
 }
