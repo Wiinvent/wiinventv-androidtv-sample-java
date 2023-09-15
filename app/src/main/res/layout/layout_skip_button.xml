@@ -24,7 +24,7 @@
     android:background="@drawable/skip_background_button"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    android:textColor="@color/skip_color_button"
+    android:textColor="@color/white"
     android:textSize="20sp"
     android:textAllCaps="false"
     android:text=""
