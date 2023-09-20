@@ -131,13 +131,13 @@ public class PlaybackVideoFragment extends Fragment {
       }
 
       @Override
-      public void showSkipButton(int duration) {
+      public void showSkipButton(@NonNull String campaignId, int duration) {
         if(skipButton != null)
           skipButton.startCountdown(duration);
       }
 
       @Override
-      public void hideSkipButton() {
+      public void hideSkipButton(@NonNull String campaignId) {
         if(skipButton != null)
           skipButton.hide();
       }
