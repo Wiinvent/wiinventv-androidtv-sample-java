@@ -25,6 +25,8 @@ public class MainActivity extends FragmentActivity {
 
   private static final String TAG = MainActivity.class.getCanonicalName();
 
+  public static final String SAMPLE_ACCOUNT_ID = "14";
+
   private WelcomeAdView welcomeAdView = null;
 
   @Override
@@ -38,7 +40,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     //Ham nay init onCreate
-    InStreamManager.Companion.getInstance().init(this, "14", DeviceType.TV, Environment.SANDBOX, 3, 5, 15, LevelLog.BODY, 8,true);
+    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 3, 5, 15, LevelLog.BODY, 8,true);
 
     //init welcome
     welcomeAdView = findViewById(R.id.welcome_ad_view);
