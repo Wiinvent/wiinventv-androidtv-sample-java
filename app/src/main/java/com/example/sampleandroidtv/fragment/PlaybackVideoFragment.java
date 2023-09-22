@@ -10,36 +10,34 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.leanback.app.VideoSupportFragment;
-import androidx.leanback.app.VideoSupportFragmentGlueHost;
-import androidx.leanback.media.MediaPlayerAdapter;
-import androidx.leanback.media.PlaybackTransportControlGlue;
-import androidx.leanback.widget.PlaybackControlsRow;
 
 import com.example.sampleandroidtv.R;
-import com.example.sampleandroidtv.pojo.Movie;
 import com.example.sampleandroidtv.activity.DetailsActivity;
+import com.example.sampleandroidtv.pojo.Movie;
 import com.example.sampleandroidtv.ui.TV360SkipAdsButtonAds;
 import com.google.ads.interactivemedia.v3.api.FriendlyObstruction;
 import com.google.ads.interactivemedia.v3.api.FriendlyObstructionPurpose;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
-import com.google.android.exoplayer2.source.MediaSourceFactory;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.source.ads.AdsMediaSource;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
+import com.google.android.exoplayer2.util.Util;
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import tv.wiinvent.androidtv.InStreamManager;
 import tv.wiinvent.androidtv.OverlayManager;
-import tv.wiinvent.androidtv.interfaces.PlayerChangeListener;
 import tv.wiinvent.androidtv.models.OverlayData;
 import tv.wiinvent.androidtv.models.ads.AdInStreamEvent;
 import tv.wiinvent.androidtv.models.ads.AdsRequestData;
@@ -127,49 +125,10 @@ public class PlaybackVideoFragment extends Fragment {
   }
 
   private void initializePlayer() {
-    //khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player
-    List<FriendlyObstruction> friendlyObstructionList = Lists.newArrayList();
-    FriendlyObstruction skipButtonObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
-      skipButton,
-        FriendlyObstructionPurpose.CLOSE_AD,
-        "This is close ad"
-    );
-    friendlyObstructionList.add(skipButtonObstruction);
-
-    FriendlyObstruction overlaysObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
-        overlayView,
-        FriendlyObstructionPurpose.OTHER,
-        "This is transparent overlays"
-    );
-    friendlyObstructionList.add(overlaysObstruction);
-
-    DataSource.Factory factory = new DefaultDataSource.Factory(requireActivity());
-    ImaAdsLoader adsLoader = InStreamManager.Companion.getInstance().getLoader(friendlyObstructionList);
-
-    MediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(factory)
-        .setAdsLoaderProvider(unusedAdTagUri -> adsLoader)
-        .setAdViewProvider(playerView);
-
-    exoPlayer = new ExoPlayer.Builder(requireContext()).setMediaSourceFactory(mediaSourceFactory).build();
+    exoPlayer = new ExoPlayer.Builder(requireContext()).build();
     playerView.setPlayer(exoPlayer);
-    Objects.requireNonNull(adsLoader).setPlayer(exoPlayer);
 
     String contentUrl = "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8";
-    AdsRequestData adsRequestData = new AdsRequestData.Builder()
-        .channelId(SAMPLE_CHANNEL_ID)
-        .streamId(SAMPLE_STREAM_ID)
-        .build();
-
-    MediaItem mediaItem =
-        new MediaItem.Builder()
-            .setUri(Uri.parse(contentUrl))
-            .setAdsConfiguration(InStreamManager.Companion.getInstance().requestAds(adsRequestData))
-            .build();
-
-    exoPlayer.setMediaItem(mediaItem);
-    exoPlayer.prepare();
-
-    exoPlayer.setPlayWhenReady(true);
 
     InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
       @Override
@@ -195,5 +154,69 @@ public class PlaybackVideoFragment extends Fragment {
         InStreamManager.Companion.getInstance().release();
       }
     });
+
+    AdsRequestData adsRequestData = new AdsRequestData.Builder()
+        .channelId(SAMPLE_CHANNEL_ID)
+        .streamId(SAMPLE_STREAM_ID)
+        .build();
+
+    DataSource.Factory factory = new DefaultDataSource.Factory(requireActivity());
+    MediaSource mediaSource = buildMediaSource(factory, contentUrl);
+
+    //khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player
+    List<FriendlyObstruction> friendlyObstructionList = Lists.newArrayList();
+    FriendlyObstruction skipButtonObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
+        skipButton,
+        FriendlyObstructionPurpose.CLOSE_AD,
+        "This is close ad"
+    );
+    friendlyObstructionList.add(skipButtonObstruction);
+
+    FriendlyObstruction overlaysObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
+        overlayView,
+        FriendlyObstructionPurpose.OTHER,
+        "This is transparent overlays"
+    );
+    friendlyObstructionList.add(overlaysObstruction);
+
+    DefaultMediaSourceFactory defaultMediaSourceFactory = new DefaultMediaSourceFactory(requireContext());
+
+    AdsMediaSource adsMediaSource = InStreamManager.Companion.getInstance()
+            .requestAds(adsRequestData,
+                mediaSource,
+                playerView,
+                exoPlayer,
+                defaultMediaSourceFactory,
+                friendlyObstructionList);
+
+    exoPlayer.addMediaSource(adsMediaSource);
+    exoPlayer.prepare();
+
+    exoPlayer.setPlayWhenReady(true);
   }
+
+  private MediaSource buildMediaSource(DataSource.Factory dataSourceFactory, String url) {
+    Uri uri = Uri.parse(url);
+    switch (Util.inferContentType(uri)) {
+      case C.TYPE_DASH:
+        return new DashMediaSource
+            .Factory(dataSourceFactory)
+            .createMediaSource(MediaItem.fromUri(uri));
+      case C.TYPE_HLS:
+        return new HlsMediaSource
+            .Factory(dataSourceFactory)
+            .setAllowChunklessPreparation(true)
+            .createMediaSource(MediaItem.fromUri(uri));
+      case C.TYPE_SS:
+        return new SsMediaSource
+            .Factory(dataSourceFactory)
+            .createMediaSource(MediaItem.fromUri(uri));
+      case C.TYPE_OTHER:
+        return new ProgressiveMediaSource.Factory(dataSourceFactory)
+            .createMediaSource(MediaItem.fromUri(uri));
+      default:
+        throw new IllegalStateException("Unexpected value: " + Util.inferContentType(uri));
+    }
+  }
+
 }
