@@ -2,6 +2,7 @@ package com.example.sampleandroidtv.fragment;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,25 +16,39 @@ import com.example.sampleandroidtv.R;
 import com.example.sampleandroidtv.activity.DetailsActivity;
 import com.example.sampleandroidtv.pojo.Movie;
 import com.example.sampleandroidtv.ui.TV360SkipAdsButtonAds;
+import com.example.sampleandroidtv.util.VideoCache;
 import com.google.ads.interactivemedia.v3.api.FriendlyObstruction;
 import com.google.ads.interactivemedia.v3.api.FriendlyObstructionPurpose;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
+import com.google.android.exoplayer2.drm.DrmSessionManager;
+import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
+import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.ads.AdsMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
+import com.google.android.exoplayer2.source.dash.manifest.DashManifest;
+import com.google.android.exoplayer2.source.dash.manifest.DashManifestParser;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.FileDataSource;
+import com.google.android.exoplayer2.upstream.cache.Cache;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.util.Util;
 import com.google.common.collect.Lists;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import tv.wiinvent.androidtv.InStreamManager;
@@ -47,10 +62,11 @@ import tv.wiinvent.androidtv.ui.OverlayView;
  * Handles video playback with media controls.
  */
 public class PlaybackVideoFragment extends Fragment {
+  private static final String DRM_LICENSE_URL = "https://license.uat.widevine.com/cenc/getcontentkey/widevine_test";
+
   private static final String TAG = "PlaybackVideoFragment";
   private StyledPlayerView playerView;
   private ExoPlayer exoPlayer;
-
   public static final String SAMPLE_ACCOUNT_ID = "14";
   public static final String SAMPLE_CHANNEL_ID = "11683";
   public static final String SAMPLE_STREAM_ID = "999999";
@@ -125,6 +141,8 @@ public class PlaybackVideoFragment extends Fragment {
   }
 
   private void initializePlayer() {
+    String userAgent = Util.getUserAgent(requireContext(), "Exo");
+
     exoPlayer = new ExoPlayer.Builder(requireContext()).build();
     playerView.setPlayer(exoPlayer);
 
@@ -160,9 +178,6 @@ public class PlaybackVideoFragment extends Fragment {
         .streamId(SAMPLE_STREAM_ID)
         .build();
 
-    DataSource.Factory factory = new DefaultDataSource.Factory(requireActivity());
-    MediaSource mediaSource = buildMediaSource(factory, contentUrl);
-
     //khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player
     List<FriendlyObstruction> friendlyObstructionList = Lists.newArrayList();
     FriendlyObstruction skipButtonObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
@@ -178,6 +193,13 @@ public class PlaybackVideoFragment extends Fragment {
         "This is transparent overlays"
     );
     friendlyObstructionList.add(overlaysObstruction);
+
+    DefaultHttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory();
+    httpDataSourceFactory.setUserAgent(userAgent);
+    httpDataSourceFactory.setTransferListener(new DefaultBandwidthMeter.Builder(requireContext())
+        .setResetOnNetworkTypeChange(false).build());
+
+    MediaSource mediaSource = buildMediaSource(buildDataSourceFactory(httpDataSourceFactory), contentUrl, getDrmSessionManager(httpDataSourceFactory));
 
     DefaultMediaSourceFactory defaultMediaSourceFactory = new DefaultMediaSourceFactory(requireContext());
 
@@ -195,13 +217,44 @@ public class PlaybackVideoFragment extends Fragment {
     exoPlayer.setPlayWhenReady(true);
   }
 
-  private MediaSource buildMediaSource(DataSource.Factory dataSourceFactory, String url) {
+  private DrmSessionManager getDrmSessionManager(DefaultHttpDataSource.Factory dataSourceFactory) {
+    try {
+      HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(DRM_LICENSE_URL, dataSourceFactory);
+      return new DefaultDrmSessionManager(C.WIDEVINE_UUID, FrameworkMediaDrm.newInstance(C.WIDEVINE_UUID), drmCallback, null, true, 10);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  public DataSource.Factory buildDataSourceFactory(DefaultHttpDataSource.Factory httpDataSourceFactory) {
+    return buildReadOnlyCacheDataSource(httpDataSourceFactory, VideoCache.getInstance(requireContext()).getCache());
+  }
+  protected static CacheDataSource.Factory buildReadOnlyCacheDataSource(
+      DataSource.Factory upstreamFactory, Cache cache) {
+    return new CacheDataSource.Factory().setCache(cache)
+        .setUpstreamDataSourceFactory(upstreamFactory)
+        .setCacheReadDataSourceFactory(new FileDataSource.Factory())
+        .setCacheWriteDataSinkFactory(null)
+        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        .setEventListener(null);
+  }
+
+
+
+  private MediaSource buildMediaSource(DataSource.Factory dataSourceFactory, String url, DrmSessionManager drmSessionManager) {
     Uri uri = Uri.parse(url);
     switch (Util.inferContentType(uri)) {
       case C.TYPE_DASH:
         return new DashMediaSource
-            .Factory(dataSourceFactory)
-            .createMediaSource(MediaItem.fromUri(uri));
+            .Factory(new DefaultDashChunkSource.Factory(dataSourceFactory), dataSourceFactory)
+            .setDrmSessionManagerProvider(mediaItem -> drmSessionManager)
+            .setManifestParser(new DashManifestParser() {
+              @NonNull
+              @Override
+              public DashManifest parse(@NonNull Uri uri, @NonNull InputStream inputStream) throws IOException {
+                return super.parse(uri, inputStream);
+              }
+            }).createMediaSource(MediaItem.fromUri(uri));
       case C.TYPE_HLS:
         return new HlsMediaSource
             .Factory(dataSourceFactory)
