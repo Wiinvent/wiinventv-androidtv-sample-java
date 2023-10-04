@@ -158,7 +158,7 @@ public class PlaybackVideoFragment extends Fragment {
       @Override
       public void showSkipButton(@NonNull String campaignId, int duration) {
         if(skipButton != null)
-          skipButton.startCountdown(duration);
+          skipButton.startCountdown(duration, true); //neu khong muon tu dong focus thi set = true
       }
 
       @Override

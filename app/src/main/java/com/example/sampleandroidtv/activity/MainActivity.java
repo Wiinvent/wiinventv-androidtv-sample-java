@@ -88,7 +88,6 @@ public class MainActivity extends FragmentActivity {
         R.id.wisdk_exo_player_view,
         R.id.wisdk_skip_button,
         "Bỏ qua quảng cáo",
-        Color.parseColor("#28282A"),
-        R.drawable.next_black);
+        R.drawable.skip_icon_button);
   }
 }

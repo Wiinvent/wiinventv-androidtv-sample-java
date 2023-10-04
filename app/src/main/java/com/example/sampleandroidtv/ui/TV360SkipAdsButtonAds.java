@@ -32,11 +32,9 @@ public class TV360SkipAdsButtonAds extends SkipAdsButtonAds {
   public void init() {
     inflate(getContext(), R.layout.layout_skip_button, this);
     this.setSkipButton(findViewById(R.id.skip_ads_button));
-    if(getSkipButton() != null) {
-      getSkipButton().setOnClickListener((View.OnClickListener) this);
-    }
     setSkipLabel("Bỏ qua quảng cáo");
-    setIconDrawable( R.drawable.next_black);
-    setColorTextSelected(Color.parseColor("#28282A"));
+   setCountdownLabel("Bỏ qua sau");
+   setUnitLabel("giây");
+    setIconDrawable( R.drawable.skip_icon_button);
   }
 }
