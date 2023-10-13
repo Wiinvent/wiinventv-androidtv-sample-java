@@ -57,6 +57,7 @@ import tv.wiinvent.androidtv.models.OverlayData;
 import tv.wiinvent.androidtv.models.ads.AdInStreamEvent;
 import tv.wiinvent.androidtv.models.ads.AdsRequestData;
 import tv.wiinvent.androidtv.ui.OverlayView;
+import tv.wiinvent.androidtv.ui.instream.SkipAdsButtonAds;
 
 /**
  * Handles video playback with media controls.
@@ -150,15 +151,21 @@ public class PlaybackVideoFragment extends Fragment {
 
     InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
       @Override
-      public void onEvent(@NonNull AdInStreamEvent adInStreamEvent) {
-        Log.d(TAG, "==========event ${event.eventType} - ${event.campaignId} - ${player?.duration})");
+      public void onEvent(@NonNull AdInStreamEvent event) {
+        Log.d(TAG, "==========event " + event.getEventType() + " - " + event.getCampaignId() + ")");
 
       }
 
       @Override
       public void showSkipButton(@NonNull String campaignId, int duration) {
         if(skipButton != null)
-          skipButton.startCountdown(duration, true); //neu khong muon tu dong focus thi set = true
+          skipButton.startCountdown(duration, () -> {
+            if(skipButton != null) {
+              skipButton.requestFocusToSkip();
+
+              Log.d(TAG, "=========request focus");
+            }
+          }); //neu khong muon tu dong focus thi set = true
       }
 
       @Override

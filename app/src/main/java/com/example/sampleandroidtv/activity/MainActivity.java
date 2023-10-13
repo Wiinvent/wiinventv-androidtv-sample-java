@@ -40,7 +40,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     //Ham nay init onCreate
-    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 3, 5, 15, LevelLog.BODY, 8,true);
+    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 3, 5, 15, LevelLog.BODY,true);
 
     //init welcome
     welcomeAdView = findViewById(R.id.welcome_ad_view);
