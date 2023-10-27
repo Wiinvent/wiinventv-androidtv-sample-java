@@ -40,12 +40,13 @@ public class MainActivity extends FragmentActivity {
     }
 
     //Ham nay init onCreate
-    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 3, 5, 15, LevelLog.BODY,true);
+    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 3, 5, 15, LevelLog.BODY,true, 0);
 
     //init welcome
     welcomeAdView = findViewById(R.id.welcome_ad_view);
 
-    AdsWelcomeManager.Companion.getInstance().init(this,  "14", DeviceType.TV, Environment.SANDBOX, 10, "", true);
+    //Bo
+    AdsWelcomeManager.Companion.getInstance().init(this,  "14", DeviceType.TV, Environment.SANDBOX, 10, "", 0, true); //TODO: them partnerSkipOffset
     AdsWelcomeManager.Companion.getInstance().addWelcomeListener(new WelcomeAdsEventListener() {
       @Override
       public void onDisplayAds() {

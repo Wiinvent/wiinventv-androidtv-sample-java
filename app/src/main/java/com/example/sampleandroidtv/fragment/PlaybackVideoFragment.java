@@ -175,9 +175,14 @@ public class PlaybackVideoFragment extends Fragment {
       }
 
       @Override
-      public void onTimeout() {
+      public void onError() {
         InStreamManager.Companion.getInstance().release();
       }
+
+//      @Override
+//      public void onTimeout() {
+//
+//      }
     });
 
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
