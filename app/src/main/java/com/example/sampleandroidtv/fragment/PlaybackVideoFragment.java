@@ -104,6 +104,22 @@ public class PlaybackVideoFragment extends Fragment {
   @Override
   public void onPause() {
     super.onPause();
+    if(exoPlayer != null) {
+      exoPlayer.setPlayWhenReady(false);
+    }
+
+    if(skipButton != null) {
+      skipButton.pause();
+    }
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    if(skipButton != null) {
+      skipButton.resume();
+    }
   }
 
   protected void init(Bundle savedInstanceState) {
@@ -283,5 +299,4 @@ public class PlaybackVideoFragment extends Fragment {
         throw new IllegalStateException("Unexpected value: " + Util.inferContentType(uri));
     }
   }
-
 }
