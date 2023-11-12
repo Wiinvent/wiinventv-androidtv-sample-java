@@ -120,6 +120,10 @@ public class PlaybackVideoFragment extends Fragment {
     if(skipButton != null) {
       skipButton.resume();
     }
+
+    if(exoPlayer != null) {
+      exoPlayer.setPlayWhenReady(true);
+    }
   }
 
   protected void init(Bundle savedInstanceState) {
