@@ -19,6 +19,7 @@
     android:usesCleartextTraffic="true"
     android:theme="@style/Theme.SampleAndroidTV">
     <activity
+      android:launchMode="singleInstance"
       android:name=".activity.MainActivity"
       android:banner="@drawable/app_icon_your_company"
       android:exported="true"

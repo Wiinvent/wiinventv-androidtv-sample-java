@@ -150,13 +150,13 @@ public class PlaybackVideoFragment extends Fragment {
     overlayManager.addPlayerListener(() -> exoPlayer != null ? exoPlayer.getCurrentPosition() : 0L);
 
     // Add player event listeners to determine overlay visibility.
-    exoPlayer.addListener(new Player.EventListener() {
+    exoPlayer.addListener(new Player.Listener() {
       @Override
-      public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+      public void onPlaybackStateChanged(int playbackState) {
         Log.d(TAG, "====onPlayerStateChanged playWhenReady: $playWhenReady - $playbackState");
 
         if (overlayManager != null)
-          overlayManager.setVisible(playWhenReady && playbackState == Player.STATE_READY);
+          overlayManager.setVisible(playbackState == Player.STATE_READY);
       }
     });
   }
@@ -173,7 +173,9 @@ public class PlaybackVideoFragment extends Fragment {
       @Override
       public void onEvent(@NonNull AdInStreamEvent event) {
         Log.d(TAG, "==========event " + event.getEventType() + " - " + event.getCampaignId() + ")");
-
+        if(event.getEventType() == AdInStreamEvent.EventType.ERROR) {
+          Log.d(TAG, "===========Xu ly error");
+        }
       }
 
       @Override
