@@ -14,8 +14,11 @@ import tv.wiinvent.androidtv.AdsWelcomeManager;
 import tv.wiinvent.androidtv.InStreamManager;
 import tv.wiinvent.androidtv.interfaces.welcome.WelcomeAdsEventListener;
 import tv.wiinvent.androidtv.logging.LevelLog;
+import tv.wiinvent.androidtv.models.ads.AdsRequestData;
+import tv.wiinvent.androidtv.models.ads.WelcomeAdsRequestData;
 import tv.wiinvent.androidtv.models.type.DeviceType;
 import tv.wiinvent.androidtv.models.type.Environment;
+import tv.wiinvent.androidtv.models.type.Gender;
 import tv.wiinvent.androidtv.ui.welcomead.WelcomeAdView;
 
 /*
@@ -46,7 +49,11 @@ public class MainActivity extends FragmentActivity {
     welcomeAdView = findViewById(R.id.welcome_ad_view);
 
     //Welcome
-    AdsWelcomeManager.Companion.getInstance().init(this,  "14", DeviceType.TV, Environment.SANDBOX, 5, 5, 5,  2500, true); //TODO: them partnerSkipOffset
+    AdsWelcomeManager.Companion.getInstance()
+        .init(this,  SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX,
+            5, 5,
+            5,  2500, "", 6, true);
+
     AdsWelcomeManager.Companion.getInstance().addWelcomeListener(new WelcomeAdsEventListener() {
       @Override
       public void onDisplayAds() {
@@ -83,13 +90,20 @@ public class MainActivity extends FragmentActivity {
       }
     });
 
+    WelcomeAdsRequestData adsRequestData = new WelcomeAdsRequestData.Builder()
+        .transId("22222")
+        .age(0)
+        .gender(Gender.NONE)
+        .build();
+
     AdsWelcomeManager.Companion.getInstance().requestAds(this,
     R.id.welcome_ad_view,
         R.layout.wisdk_welcome_tvc_detail,
         R.id.wisdk_exo_player_view,
         R.id.wisdk_skip_button,
         "Bỏ qua quảng cáo",
-        R.drawable.skip_icon_button);
+        R.drawable.skip_icon_button,
+        adsRequestData);
   }
 
   @Override

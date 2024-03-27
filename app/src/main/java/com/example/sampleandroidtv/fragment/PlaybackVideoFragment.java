@@ -56,6 +56,8 @@ import tv.wiinvent.androidtv.OverlayManager;
 import tv.wiinvent.androidtv.models.OverlayData;
 import tv.wiinvent.androidtv.models.ads.AdInStreamEvent;
 import tv.wiinvent.androidtv.models.ads.AdsRequestData;
+import tv.wiinvent.androidtv.models.type.ContentType;
+import tv.wiinvent.androidtv.models.type.Gender;
 import tv.wiinvent.androidtv.ui.OverlayView;
 import tv.wiinvent.androidtv.ui.instream.SkipAdsButtonAds;
 
@@ -210,6 +212,13 @@ public class PlaybackVideoFragment extends Fragment {
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
         .channelId(SAMPLE_CHANNEL_ID)
         .streamId(SAMPLE_STREAM_ID)
+        .transId("222222")
+        .contentType(ContentType.VOD) //Neu la LIVE_STREAM | VOD
+        .title("Tieu de cua noi dung")
+        .category("category 1, category 2") //danh sach category cua noi dung - cac category ngan cach nhau boi dau ,
+        .keyword("keyword 1, keyword 2")
+        .age(0)
+        .gender(Gender.NONE)
         .build();
 
     //khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player
