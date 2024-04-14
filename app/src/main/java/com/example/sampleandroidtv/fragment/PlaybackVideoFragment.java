@@ -212,13 +212,11 @@ public class PlaybackVideoFragment extends Fragment {
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
         .channelId(SAMPLE_CHANNEL_ID)
         .streamId(SAMPLE_STREAM_ID)
-        .transId("222222")
-        .contentType(ContentType.VOD) //Neu la LIVE_STREAM | VOD
+        .transId("222222") //Transaction cua TV360
+        .contentType(ContentType.FILM) //Neu la LIVE_STREAM | VOD
         .title("Tieu de cua noi dung")
         .category("category 1, category 2") //danh sach category cua noi dung - cac category ngan cach nhau boi dau ,
         .keyword("keyword 1, keyword 2")
-        .age(0)
-        .gender(Gender.NONE)
         .build();
 
     //khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player

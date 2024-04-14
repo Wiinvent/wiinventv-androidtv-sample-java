@@ -91,9 +91,7 @@ public class MainActivity extends FragmentActivity {
     });
 
     WelcomeAdsRequestData adsRequestData = new WelcomeAdsRequestData.Builder()
-        .transId("22222")
-        .age(0)
-        .gender(Gender.NONE)
+        .transId("22222") //Transaction cua TV360
         .build();
 
     AdsWelcomeManager.Companion.getInstance().requestAds(this,
