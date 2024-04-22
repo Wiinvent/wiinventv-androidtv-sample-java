@@ -210,13 +210,14 @@ public class PlaybackVideoFragment extends Fragment {
     });
 
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
-        .channelId(SAMPLE_CHANNEL_ID)
-        .streamId(SAMPLE_STREAM_ID)
-        .transId("222222") //Transaction cua TV360
-        .contentType(ContentType.FILM) //Neu la LIVE_STREAM | VOD
-        .title("Tieu de cua noi dung")
-        .category("category 1, category 2") //danh sach category cua noi dung - cac category ngan cach nhau boi dau ,
-        .keyword("keyword 1, keyword 2")
+        .channelId("998989,222222") // danh sách id của category của nội dung & cách nhau bằng dấu ,
+        .streamId("999999") // id nội dung
+        .transId("222222") // Transaction cua TV360
+        .contentType(ContentType.FILM) // content type TV | FILM | VIDEO
+        .title("Tieu de cua noi dung") // tiêu đề nội dung
+        .category("category 1, category 2") // danh sach tiêu đề category của nội dung & cách nhau bằng dấu ,
+        .keyword("keyword 1, keyword 2") // từ khoá nếu có | để "" nếu ko có
+        .uid20("") // unified id 2.0, nếu không có thì set ""
         .build();
 
     //khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player

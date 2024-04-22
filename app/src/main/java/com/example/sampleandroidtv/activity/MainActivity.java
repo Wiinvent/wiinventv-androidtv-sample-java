@@ -91,7 +91,8 @@ public class MainActivity extends FragmentActivity {
     });
 
     WelcomeAdsRequestData adsRequestData = new WelcomeAdsRequestData.Builder()
-        .transId("22222") //Transaction cua TV360
+        .transId("22222") // mã giao dịch tạo từ server đối tác - client liên hệ server
+        .uid20("") // unified id 2.0, nếu không có thì set ""
         .build();
 
     AdsWelcomeManager.Companion.getInstance().requestAds(this,
