@@ -4,7 +4,7 @@ plugins {
 
 android {
   namespace 'com.example.sampleandroidtv'
-  compileSdk 34
+  compileSdk 33
 
   defaultConfig {
     applicationId "com.example.sampleandroidtv"
@@ -34,6 +34,6 @@ dependencies {
   implementation 'androidx.work:work-runtime-ktx:2.7.1'
   implementation 'androidx.core:core-ktx:1.5.0'
   implementation 'androidx.appcompat:appcompat:1.3.0'
-  implementation 'tv.wiinvent:wiinvent-sdk-android-tv:1.1.1'
+  implementation 'tv.wiinvent:wiinvent-sdk-android-tv:1.1.2'
   implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
