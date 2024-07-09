@@ -58,6 +58,7 @@ import tv.wiinvent.androidtv.models.ads.AdInStreamEvent;
 import tv.wiinvent.androidtv.models.ads.AdsRequestData;
 import tv.wiinvent.androidtv.models.type.ContentType;
 import tv.wiinvent.androidtv.models.type.Gender;
+import tv.wiinvent.androidtv.ui.FriendlyPlayerView;
 import tv.wiinvent.androidtv.ui.OverlayView;
 import tv.wiinvent.androidtv.ui.instream.SkipAdsButtonAds;
 
@@ -68,7 +69,7 @@ public class PlaybackVideoFragment extends Fragment {
   private static final String DRM_LICENSE_URL = "https://license.uat.widevine.com/cenc/getcontentkey/widevine_test";
 
   private static final String TAG = "PlaybackVideoFragment";
-  private StyledPlayerView playerView;
+  private FriendlyPlayerView playerView;
   private ExoPlayer exoPlayer;
   public static final String SAMPLE_ACCOUNT_ID = "14";
   public static final String SAMPLE_CHANNEL_ID = "11683";
@@ -169,7 +170,8 @@ public class PlaybackVideoFragment extends Fragment {
     exoPlayer = new ExoPlayer.Builder(requireContext()).build();
     playerView.setPlayer(exoPlayer);
 
-    String contentUrl = "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8";
+//    String contentUrl = "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8";
+    String contentUrl = "https://vod-zlr5.tv360.vn/wiinvent/2024/6/25/stock_1719331427822.mp4";
 
     InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
       @Override
@@ -236,6 +238,10 @@ public class PlaybackVideoFragment extends Fragment {
     );
     friendlyObstructionList.add(overlaysObstruction);
 
+    if(playerView != null) {
+      playerView.addFriendlyObstructionList(friendlyObstructionList);
+    }
+
     DefaultHttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory();
     httpDataSourceFactory.setUserAgent(userAgent);
     httpDataSourceFactory.setTransferListener(new DefaultBandwidthMeter.Builder(requireContext())
@@ -250,8 +256,7 @@ public class PlaybackVideoFragment extends Fragment {
                 mediaSource,
                 playerView,
                 exoPlayer,
-                defaultMediaSourceFactory,
-                friendlyObstructionList);
+                defaultMediaSourceFactory);
 
     exoPlayer.addMediaSource(adsMediaSource);
     exoPlayer.prepare();
