@@ -93,6 +93,7 @@ public class MainActivity extends FragmentActivity {
     WelcomeAdsRequestData adsRequestData = new WelcomeAdsRequestData.Builder()
         .transId("22222") // mã giao dịch tạo từ server đối tác - client liên hệ server
         .uid20("") // unified id 2.0, nếu không có thì set ""
+        .segments("123,12,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
         .build();
 
     AdsWelcomeManager.Companion.getInstance().requestAds(this,

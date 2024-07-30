@@ -27,6 +27,7 @@ import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
+import com.google.android.exoplayer2.drm.UnsupportedDrmException;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
@@ -50,6 +51,7 @@ import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 
 import tv.wiinvent.androidtv.InStreamManager;
 import tv.wiinvent.androidtv.OverlayManager;
@@ -220,6 +222,7 @@ public class PlaybackVideoFragment extends Fragment {
         .category("category 1, category 2") // danh sach tiêu đề category của nội dung & cách nhau bằng dấu ,
         .keyword("keyword 1, keyword 2") // từ khoá nếu có | để "" nếu ko có
         .uid20("") // unified id 2.0, nếu không có thì set ""
+        .segments("123,1,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
         .build();
 
     //khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player
@@ -265,12 +268,12 @@ public class PlaybackVideoFragment extends Fragment {
   }
 
   private DrmSessionManager getDrmSessionManager(DefaultHttpDataSource.Factory dataSourceFactory) {
-    try {
-      HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(DRM_LICENSE_URL, dataSourceFactory);
-      return new DefaultDrmSessionManager(C.WIDEVINE_UUID, FrameworkMediaDrm.newInstance(C.WIDEVINE_UUID), drmCallback, null, true, 10);
-    } catch (Exception e) {
-      return null;
-    }
+    String licenseUrl = "https://your-license-server.com";
+    UUID drmSchemeUuid = C.WIDEVINE_UUID;
+    HttpMediaDrmCallback drmCallback = new HttpMediaDrmCallback(licenseUrl, dataSourceFactory);
+    return new DefaultDrmSessionManager.Builder()
+        .setUuidAndExoMediaDrmProvider(drmSchemeUuid, FrameworkMediaDrm.DEFAULT_PROVIDER)
+        .build(drmCallback);
   }
 
   public DataSource.Factory buildDataSourceFactory(DefaultHttpDataSource.Factory httpDataSourceFactory) {
