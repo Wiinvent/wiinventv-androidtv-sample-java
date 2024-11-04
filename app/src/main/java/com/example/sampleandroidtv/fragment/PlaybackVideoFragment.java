@@ -2,7 +2,6 @@ package com.example.sampleandroidtv.fragment;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,18 +26,15 @@ import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
 import com.google.android.exoplayer2.drm.HttpMediaDrmCallback;
-import com.google.android.exoplayer2.drm.UnsupportedDrmException;
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.ads.AdsMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.dash.manifest.DashManifest;
 import com.google.android.exoplayer2.source.dash.manifest.DashManifestParser;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
@@ -51,6 +47,7 @@ import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import tv.wiinvent.androidtv.InStreamManager;
@@ -59,10 +56,8 @@ import tv.wiinvent.androidtv.models.OverlayData;
 import tv.wiinvent.androidtv.models.ads.AdInStreamEvent;
 import tv.wiinvent.androidtv.models.ads.AdsRequestData;
 import tv.wiinvent.androidtv.models.type.ContentType;
-import tv.wiinvent.androidtv.models.type.Gender;
-import tv.wiinvent.androidtv.ui.FriendlyPlayerView;
 import tv.wiinvent.androidtv.ui.OverlayView;
-import tv.wiinvent.androidtv.ui.instream.SkipAdsButtonAds;
+import tv.wiinvent.androidtv.ui.instream.player.AdPlayerView;
 
 /**
  * Handles video playback with media controls.
@@ -71,17 +66,20 @@ public class PlaybackVideoFragment extends Fragment {
   private static final String DRM_LICENSE_URL = "https://license.uat.widevine.com/cenc/getcontentkey/widevine_test";
 
   private static final String TAG = "PlaybackVideoFragment";
-  private FriendlyPlayerView playerView;
+  private PlayerView playerView;
+  private AdPlayerView adPlayerView;
   private ExoPlayer exoPlayer;
   public static final String SAMPLE_ACCOUNT_ID = "14";
   public static final String SAMPLE_CHANNEL_ID = "11683";
-  public static final String SAMPLE_STREAM_ID = "999999";
+  public static final String SAMPLE_STREAM_ID = "5656262327";
   public static final String SAMPLE_TOKEN = "3001";
 
   private OverlayManager overlayManager;
 
   private OverlayView overlayView;
   private TV360SkipAdsButtonAds skipButton;
+
+  private float currentVolume = 0F;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -101,6 +99,7 @@ public class PlaybackVideoFragment extends Fragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     playerView = requireActivity().findViewById(R.id.simple_exo_player_view);
+    adPlayerView = requireActivity().findViewById(R.id.ad_player_view);
     skipButton = requireActivity().findViewById(R.id.skip_button);
     overlayView = requireActivity().findViewById(R.id.wisdk_overlay_view);
     init(savedInstanceState);
@@ -175,6 +174,9 @@ public class PlaybackVideoFragment extends Fragment {
 //    String contentUrl = "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8";
     String contentUrl = "https://vod-zlr5.tv360.vn/wiinvent/2024/6/25/stock_1719331427822.mp4";
 
+    ContentType contentType = ContentType.FILM;
+    currentVolume = exoPlayer.getVolume();
+
     InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
       @Override
       public void onEvent(@NonNull AdInStreamEvent event) {
@@ -203,19 +205,63 @@ public class PlaybackVideoFragment extends Fragment {
       }
 
       @Override
-      public void onError() {
-        InStreamManager.Companion.getInstance().release();
+      public void showContentPlayer() {
+        requireActivity().runOnUiThread(() -> {
+          if (contentType == ContentType.TV) {
+            if (exoPlayer != null) {
+              exoPlayer.setVolume(currentVolume);
+            }
+          } else {
+            if (exoPlayer != null) {
+              exoPlayer.play();
+            }
+          }
+
+          if (playerView != null) {
+            playerView.setVisibility(View.VISIBLE);
+          }
+        });
       }
 
-//      @Override
-//      public void onTimeout() {
-//
-//      }
+      @Override
+      public void hideContentPlayer() {
+        requireActivity().runOnUiThread(() -> {
+          if (contentType == ContentType.TV) {
+            if (exoPlayer != null) {
+              currentVolume = exoPlayer.getVolume();
+              exoPlayer.setVolume(0);
+            }
+          } else {
+            if (exoPlayer != null) {
+              exoPlayer.pause();
+            }
+          }
+
+          if (playerView != null) {
+            playerView.setVisibility(View.GONE);
+          }
+        });
+      }
+
+      @Override
+      public void onEventSkip(@NonNull String s) {
+        //write log
+      }
+
+      @Override
+      public void onFailure() {
+        //write log
+      }
+
+      @Override
+      public void onTimeout() {
+        //write log
+      }
     });
 
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
         .channelId("998989,222222") // danh sách id của category của nội dung & cách nhau bằng dấu ,
-        .streamId("999999") // id nội dung
+        .streamId(SAMPLE_STREAM_ID) // id nội dung
         .transId("222222") // Transaction cua TV360
         .contentType(ContentType.FILM) // content type TV | FILM | VIDEO
         .title("Tieu de cua noi dung") // tiêu đề nội dung
@@ -241,10 +287,6 @@ public class PlaybackVideoFragment extends Fragment {
     );
     friendlyObstructionList.add(overlaysObstruction);
 
-    if(playerView != null) {
-      playerView.addFriendlyObstructionList(friendlyObstructionList);
-    }
-
     DefaultHttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory();
     httpDataSourceFactory.setUserAgent(userAgent);
     httpDataSourceFactory.setTransferListener(new DefaultBandwidthMeter.Builder(requireContext())
@@ -252,16 +294,13 @@ public class PlaybackVideoFragment extends Fragment {
 
     MediaSource mediaSource = buildMediaSource(buildDataSourceFactory(httpDataSourceFactory), contentUrl, getDrmSessionManager(httpDataSourceFactory));
 
-    DefaultMediaSourceFactory defaultMediaSourceFactory = new DefaultMediaSourceFactory(requireContext());
-
-    AdsMediaSource adsMediaSource = InStreamManager.Companion.getInstance()
+    InStreamManager.Companion.getInstance()
             .requestAds(adsRequestData,
-                mediaSource,
-                playerView,
+                adPlayerView,
                 exoPlayer,
-                defaultMediaSourceFactory);
+                friendlyObstructionList);
 
-    exoPlayer.addMediaSource(adsMediaSource);
+    exoPlayer.addMediaSource(mediaSource);
     exoPlayer.prepare();
 
     exoPlayer.setPlayWhenReady(true);

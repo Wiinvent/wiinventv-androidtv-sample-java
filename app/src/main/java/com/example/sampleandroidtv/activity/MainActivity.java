@@ -1,24 +1,21 @@
 package com.example.sampleandroidtv.activity;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.sampleandroidtv.fragment.MainFragment;
 import com.example.sampleandroidtv.R;
+import com.example.sampleandroidtv.fragment.MainFragment;
 
 import tv.wiinvent.androidtv.AdsWelcomeManager;
 import tv.wiinvent.androidtv.InStreamManager;
 import tv.wiinvent.androidtv.interfaces.welcome.WelcomeAdsEventListener;
 import tv.wiinvent.androidtv.logging.LevelLog;
-import tv.wiinvent.androidtv.models.ads.AdsRequestData;
 import tv.wiinvent.androidtv.models.ads.WelcomeAdsRequestData;
 import tv.wiinvent.androidtv.models.type.DeviceType;
 import tv.wiinvent.androidtv.models.type.Environment;
-import tv.wiinvent.androidtv.models.type.Gender;
 import tv.wiinvent.androidtv.ui.welcomead.WelcomeAdView;
 
 /*
@@ -28,7 +25,7 @@ public class MainActivity extends FragmentActivity {
 
   private static final String TAG = MainActivity.class.getCanonicalName();
 
-  public static final String SAMPLE_ACCOUNT_ID = "4";
+  public static final String SAMPLE_ACCOUNT_ID = "14";
 
   private WelcomeAdView welcomeAdView = null;
 
@@ -43,14 +40,14 @@ public class MainActivity extends FragmentActivity {
     }
 
     //Ham nay init onCreate
-    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.PRODUCTION, 5, 1, 5, 2500, LevelLog.BODY,true, 8);
+    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 5, 1, 5, 2500, LevelLog.BODY,true, 8);
 
     //init welcome
     welcomeAdView = findViewById(R.id.welcome_ad_view);
 
     //Welcome
     AdsWelcomeManager.Companion.getInstance()
-        .init(this,  SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.PRODUCTION,
+        .init(this,  SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX,
             5, 5,
             5,  2500, "", 6, true);
 
@@ -100,6 +97,7 @@ public class MainActivity extends FragmentActivity {
     R.id.welcome_ad_view,
         R.layout.wisdk_welcome_tvc_detail,
         R.id.wisdk_exo_player_view,
+        R.id.wisdk_ad_player_view,
         R.id.wisdk_skip_button,
         "Bỏ qua quảng cáo",
         R.drawable.skip_icon_button,
