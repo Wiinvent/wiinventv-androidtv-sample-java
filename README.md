@@ -29,8 +29,8 @@ Khởi tạo SDK với một vài bước như sau:
 
 Code mẫu triển khai trong file PlaybackVideoFragment:
 ```java
-    //1. Khởi tạo InStreamManager
-    InStreamManager.Companion.getInstance().init(requireContext(), SAMPLE_TENANT_ID, DeviceType.TV, Environment.PRODUCTION, 5, 1, 5, 2500, LevelLog.BODY,true, 8);
+//1. Khởi tạo InStreamManager
+InStreamManager.Companion.getInstance().init(requireContext(), SAMPLE_TENANT_ID, DeviceType.TV, Environment.PRODUCTION, 5, 1, 5, 2500, LevelLog.BODY,true, 8);
 
 String userAgent = Util.getUserAgent(requireContext(), "Exo");
 
