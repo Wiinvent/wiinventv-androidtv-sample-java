@@ -27,6 +27,35 @@ Khởi tạo SDK với một vài bước như sau:
 3. Khởi tạo AdsRequestData với channelId, streamId cùng các tham số khác (mô tả ở phía dưới)
 4. Khai báo thêm FriendlyObstruction đối với các view đè lên trên player.
 
+Layout:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+  <!--Playerview cho player-->
+  <tv.wiinvent.androidtv.ui.FriendlyPlayerView
+    android:id="@+id/simple_exo_player_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+  
+  <!--Nút bỏ qua-->
+  <com.example.sampleandroidtv.ui.TV360SkipAdsButtonAds
+    android:id="@+id/skip_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    android:layout_marginEnd="20dp"
+    android:layout_marginBottom="60dp"
+    android:visibility="gone"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
 Code mẫu triển khai trong file PlaybackVideoFragment:
 ```java
 //1. Khởi tạo InStreamManager
