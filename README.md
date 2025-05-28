@@ -40,37 +40,37 @@ exoPlayer = new ExoPlayer.Builder(requireContext()).build();
 String contentUrl = "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8";
 
 //2. Thêm WiAdsLoaderListener
-    InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
-    @Override
-    public void onEvent(@NonNull AdInStreamEvent event) {
-        Log.d(TAG, "==========event " + event.getEventType() + " - " + event.getCampaignId() + ")");
-        if(event.getEventType() == AdInStreamEvent.EventType.ERROR) {
-            Log.d(TAG, "===========Xu ly error");
-        }
+InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
+@Override
+public void onEvent(@NonNull AdInStreamEvent event) {
+    Log.d(TAG, "==========event " + event.getEventType() + " - " + event.getCampaignId() + ")");
+    if(event.getEventType() == AdInStreamEvent.EventType.ERROR) {
+        Log.d(TAG, "===========Xu ly error");
     }
+}
 
-    @Override
-    public void showSkipButton(@NonNull String campaignId, int duration) {
-        if(skipButton != null)
-            skipButton.startCountdown(duration, () -> {
-                if(skipButton != null) {
-                    skipButton.requestFocusToSkip();
+@Override
+public void showSkipButton(@NonNull String campaignId, int duration) {
+    if(skipButton != null)
+        skipButton.startCountdown(duration, () -> {
+            if(skipButton != null) {
+                skipButton.requestFocusToSkip();
 
-                    Log.d(TAG, "=========request focus");
-                }
-            }); //neu khong muon tu dong focus thi set = true
-    }
+                Log.d(TAG, "=========request focus");
+            }
+        }); //neu khong muon tu dong focus thi set = true
+}
 
-    @Override
-    public void hideSkipButton(@NonNull String campaignId) {
-        if(skipButton != null)
-            skipButton.hide();
-    }
+@Override
+public void hideSkipButton(@NonNull String campaignId) {
+    if(skipButton != null)
+        skipButton.hide();
+}
 
-    @Override
-    public void onError() {
-        InStreamManager.Companion.getInstance().release();
-    }
+@Override
+public void onError() {
+    InStreamManager.Companion.getInstance().release();
+}
 
 //      @Override
 //      public void onTimeout() {
@@ -80,36 +80,38 @@ String contentUrl = "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/mas
 
 //3. Khởi tạo AdsRequestData 
 AdsRequestData adsRequestData = new AdsRequestData.Builder()
-        .channelId("998989,222222") // danh sách id của category của nội dung & cách nhau bằng dấu ,
-        .streamId("999999") // id nội dung
-        .transId("222222") // Transaction cua TV360
-        .contentType(ContentType.FILM) // content type TV | FILM | VIDEO
-        .title("Tieu de cua noi dung") // tiêu đề nội dung
-        .category("category 1, category 2") // danh sach tiêu đề category của nội dung & cách nhau bằng dấu ,
-        .keyword("keyword 1, keyword 2") // từ khoá nếu có | để "" nếu ko có
-        .uid20("") // unified id 2.0, nếu không có thì set ""
-        .segments("123,1,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
-        .build();
+    .channelId("998989,222222") // danh sách id của category của nội dung & cách nhau bằng dấu ,
+    .streamId("999999") // id nội dung
+    .transId("222222") // Transaction cua TV360
+    .contentType(ContentType.FILM) // content type TV | FILM | VIDEO
+    .title("Tieu de cua noi dung") // tiêu đề nội dung
+    .category("category 1, category 2") // danh sach tiêu đề category của nội dung & cách nhau bằng dấu ,
+    .keyword("keyword 1, keyword 2") // từ khoá nếu có | để "" nếu ko có
+    .uid20("") // unified id 2.0, nếu không có thì set ""
+    .segments("123,1,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
+    .build();
 
 //4. khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player
 List<FriendlyObstruction> friendlyObstructionList = Lists.newArrayList();
 FriendlyObstruction skipButtonObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
-        skipButton,
-        FriendlyObstructionPurpose.CLOSE_AD,
-        "This is close ad"
+    skipButton,
+    FriendlyObstructionPurpose.CLOSE_AD,
+    "This is close ad"
 );
-    friendlyObstructionList.add(skipButtonObstruction);
+
+friendlyObstructionList.add(skipButtonObstruction);
 
 FriendlyObstruction overlaysObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
-        overlayView,
-        FriendlyObstructionPurpose.OTHER,
-        "This is transparent overlays"
+    overlayView,
+    FriendlyObstructionPurpose.OTHER,
+    "This is transparent overlays"
 );
-    friendlyObstructionList.add(overlaysObstruction);
 
-    if(playerView != null) {
-        playerView.addFriendlyObstructionList(friendlyObstructionList);
-    }
+friendlyObstructionList.add(overlaysObstruction);
+
+if(playerView != null) {
+    playerView.addFriendlyObstructionList(friendlyObstructionList);
+}
 
 DefaultHttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory();
     httpDataSourceFactory.setUserAgent(userAgent);
@@ -121,16 +123,16 @@ MediaSource mediaSource = buildMediaSource(buildDataSourceFactory(httpDataSource
 DefaultMediaSourceFactory defaultMediaSourceFactory = new DefaultMediaSourceFactory(requireContext());
 
 AdsMediaSource adsMediaSource = InStreamManager.Companion.getInstance()
-        .requestAds(adsRequestData,
-                mediaSource,
-                playerView,
-                exoPlayer,
-                defaultMediaSourceFactory);
+    .requestAds(adsRequestData,
+            mediaSource,
+            playerView,
+            exoPlayer,
+            defaultMediaSourceFactory);
 
-    exoPlayer.addMediaSource(adsMediaSource);
-    exoPlayer.prepare();
+exoPlayer.addMediaSource(adsMediaSource);
+exoPlayer.prepare();
 
-    exoPlayer.setPlayWhenReady(true);
+exoPlayer.setPlayWhenReady(true);
 ```
 
 #### 3. Mô tả các hằng số và tham số
