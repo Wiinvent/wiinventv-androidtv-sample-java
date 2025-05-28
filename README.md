@@ -134,7 +134,7 @@ AdsMediaSource adsMediaSource = InStreamManager.Companion.getInstance()
 ```
 
 #### 3. Mô tả các hằng số và tham số
-1. Tham số init
+1. Tham số init của InStreamManager
 
 | Key                   | Description                                               |     Type |
 |:----------------------|:----------------------------------------------------------|---------:|
@@ -148,6 +148,8 @@ AdsMediaSource adsMediaSource = InStreamManager.Companion.getInstance()
 | logLevel              | level của log , môi trường PRODUCTION cần set về mức NONE | constant |                                  
 | alwaysCustomSkip      | Biến hiển thị nút skip mặc định hay custom                |  boolean |                                  
 | partnerSkipOffset     | Thời gian bỏ qua                                          |  integer |
+
+2. Tham số của AdsRequestData
 
 | Key          | Description                                                                        |       Type |
 |:-------------|:-----------------------------------------------------------------------------------|-----------:|
@@ -163,7 +165,7 @@ AdsMediaSource adsMediaSource = InStreamManager.Companion.getInstance()
 | gender       | Giới tính (nếu có)                                                                 |   constant |
 | uid20        | Unified id 2.0 (nếu có)                                                            |     string |
 
-2. Hằng số
+3. Hằng số
 
 | Key         | Description                                                                                     |
 |:------------|:------------------------------------------------------------------------------------------------|
@@ -173,7 +175,7 @@ AdsMediaSource adsMediaSource = InStreamManager.Companion.getInstance()
 | logLevel    | LevelLog.NONE <br/> LevelLog.BODY                                                               |
 | adSize      | BannerAdSize.BANNER <br/> BannerAdSize.LARGE_BANNER <br/> BannerAdSize.RECTANGLE                |
 
-2. Hằng số callback
+4. Hằng số callback
 
 | Type      | Value      | Description                                   |
 |:----------|:-----------|:----------------------------------------------|
