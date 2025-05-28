@@ -22,10 +22,11 @@ implementation 'tv.wiinvent:wiinvent-sdk-android:1.1.9'
 #### 2. Sử dụng
 
 Khởi tạo SDK với một vài bước như sau:
-1. Khởi tạo InStreamManager với một số các tham được mô tả ở dưới
-2. Thêm WiAdsLoaderListener để lắng nghe một số các event, lỗi và ẩn hiện nút bỏ qua
-3. Khởi tạo AdsRequestData với channelId, streamId cùng các tham số khác (mô tả ở phía dưới)
-4. Khai báo thêm FriendlyObstruction đối với các view đè lên trên player.
+1. Cấu hình layout với FriendlyPlayerView và TV360SkipAdsButtonAds
+2. Khởi tạo InStreamManager với một số các tham được mô tả ở dưới
+3. Thêm WiAdsLoaderListener để lắng nghe một số các event, lỗi và ẩn hiện nút bỏ qua
+4. Khởi tạo AdsRequestData với channelId, streamId cùng các tham số khác (mô tả ở phía dưới)
+5. Khai báo thêm FriendlyObstruction đối với các view đè lên trên player.
 
 Layout:
 
