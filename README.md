@@ -1,5 +1,5 @@
 
-### Hướng dẫn tích hợp quảng cáo Instream
+### Hướng dẫn tích hợp quảng cáo Instream phương án TVC quảng cáo và nội dung chạy chung player
 #### 1. Thêm Repository
 Bổ sung config sau đây vào file `build.gradle` ở thư mục gốc của project.
 
