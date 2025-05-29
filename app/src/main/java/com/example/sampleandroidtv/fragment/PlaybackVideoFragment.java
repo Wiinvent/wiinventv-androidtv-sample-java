@@ -52,10 +52,13 @@ import java.util.UUID;
 
 import tv.wiinvent.androidtv.InStreamManager;
 import tv.wiinvent.androidtv.OverlayManager;
+import tv.wiinvent.androidtv.logging.LevelLog;
 import tv.wiinvent.androidtv.models.OverlayData;
 import tv.wiinvent.androidtv.models.ads.AdInStreamEvent;
 import tv.wiinvent.androidtv.models.ads.AdsRequestData;
 import tv.wiinvent.androidtv.models.type.ContentType;
+import tv.wiinvent.androidtv.models.type.DeviceType;
+import tv.wiinvent.androidtv.models.type.Environment;
 import tv.wiinvent.androidtv.ui.OverlayView;
 import tv.wiinvent.androidtv.ui.instream.player.AdPlayerView;
 
@@ -76,7 +79,7 @@ public class PlaybackVideoFragment extends Fragment {
 
   private OverlayManager overlayManager;
 
-  private OverlayView overlayView;
+//  private OverlayView overlayView;
   private TV360SkipAdsButtonAds skipButton;
 
   private float currentVolume = 0F;
@@ -101,7 +104,7 @@ public class PlaybackVideoFragment extends Fragment {
     playerView = requireActivity().findViewById(R.id.simple_exo_player_view);
     adPlayerView = requireActivity().findViewById(R.id.ad_player_view);
     skipButton = requireActivity().findViewById(R.id.skip_button);
-    overlayView = requireActivity().findViewById(R.id.wisdk_overlay_view);
+//    overlayView = requireActivity().findViewById(R.id.wisdk_overlay_view);
     init(savedInstanceState);
   }
 
@@ -133,50 +136,54 @@ public class PlaybackVideoFragment extends Fragment {
   protected void init(Bundle savedInstanceState) {
     if (savedInstanceState == null) {
       initializePlayer();
-      initializeOverlays();
+//      initializeOverlays();
     }
   }
 
-  private void initializeOverlays() {
-//        OverlayData overlayData = null;
-    OverlayData overlayData = new OverlayData.Builder()
-        .accountId(SAMPLE_ACCOUNT_ID)
-        .channelId(SAMPLE_CHANNEL_ID)
-        .streamId(SAMPLE_STREAM_ID)
-        .thirdPartyToken(SAMPLE_TOKEN)
-        .env(OverlayData.Environment.SANDBOX)
-        .deviceType(OverlayData.DeviceType.TV)
-        .contentType(OverlayData.ContentType.LIVESTREAM)
-        .build();
-
-    overlayManager = new OverlayManager(requireActivity(), R.id.wisdk_overlay_view, overlayData);
-
-    overlayManager.addPlayerListener(() -> exoPlayer != null ? exoPlayer.getCurrentPosition() : 0L);
-
-    // Add player event listeners to determine overlay visibility.
-    exoPlayer.addListener(new Player.Listener() {
-      @Override
-      public void onPlaybackStateChanged(int playbackState) {
-        Log.d(TAG, "====onPlayerStateChanged playWhenReady: $playWhenReady - $playbackState");
-
-        if (overlayManager != null)
-          overlayManager.setVisible(playbackState == Player.STATE_READY);
-      }
-    });
-  }
+//  private void initializeOverlays() {
+////        OverlayData overlayData = null;
+//    OverlayData overlayData = new OverlayData.Builder()
+//        .accountId(SAMPLE_ACCOUNT_ID)
+//        .channelId(SAMPLE_CHANNEL_ID)
+//        .streamId(SAMPLE_STREAM_ID)
+//        .thirdPartyToken(SAMPLE_TOKEN)
+//        .env(OverlayData.Environment.SANDBOX)
+//        .deviceType(OverlayData.DeviceType.TV)
+//        .contentType(OverlayData.ContentType.LIVESTREAM)
+//        .build();
+//
+//    overlayManager = new OverlayManager(requireActivity(), R.id.wisdk_overlay_view, overlayData);
+//
+//    overlayManager.addPlayerListener(() -> exoPlayer != null ? exoPlayer.getCurrentPosition() : 0L);
+//
+//    // Add player event listeners to determine overlay visibility.
+//    exoPlayer.addListener(new Player.Listener() {
+//      @Override
+//      public void onPlaybackStateChanged(int playbackState) {
+//        Log.d(TAG, "====onPlayerStateChanged playWhenReady: $playWhenReady - $playbackState");
+//
+//        if (overlayManager != null)
+//          overlayManager.setVisible(playbackState == Player.STATE_READY);
+//      }
+//    });
+//  }
 
   private void initializePlayer() {
+    // 2. Khởi tạo InStreamManager
+    InStreamManager.Companion.getInstance().init(requireContext(), SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 5, 5, 5, 2500, LevelLog.BODY,true, 8);
+
+
     String userAgent = Util.getUserAgent(requireContext(), "Exo");
 
     exoPlayer = new ExoPlayer.Builder(requireContext()).build();
     playerView.setPlayer(exoPlayer);
 
-//    String contentUrl = "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8";
-    String contentUrl = "https://vod-zlr5.tv360.vn/wiinvent/2024/6/25/stock_1719331427822.mp4";
+    String contentUrl = "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8";
 
     ContentType contentType = ContentType.FILM;
     currentVolume = exoPlayer.getVolume();
 
+    //3. Thêm WiAdsLoaderListener
     InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
       @Override
       public void onEvent(@NonNull AdInStreamEvent event) {
@@ -259,9 +266,10 @@ public class PlaybackVideoFragment extends Fragment {
       }
     });
 
+    //4. Khởi tạo AdsRequestData
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
         .channelId("998989,222222") // danh sách id của category của nội dung & cách nhau bằng dấu ,
-        .streamId(SAMPLE_STREAM_ID) // id nội dung
+        .streamId("179") // id nội dung
         .transId("222222") // Transaction cua TV360
         .contentType(ContentType.FILM) // content type TV | FILM | VIDEO
         .title("Tieu de cua noi dung") // tiêu đề nội dung
@@ -271,7 +279,7 @@ public class PlaybackVideoFragment extends Fragment {
         .segments("123,1,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
         .build();
 
-    //khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player
+    //5. khai bao friendly obstruction --- quan trong => can phai cai khao het cac lop phu len tren player
     List<FriendlyObstruction> friendlyObstructionList = Lists.newArrayList();
     FriendlyObstruction skipButtonObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
         skipButton,
@@ -280,12 +288,12 @@ public class PlaybackVideoFragment extends Fragment {
     );
     friendlyObstructionList.add(skipButtonObstruction);
 
-    FriendlyObstruction overlaysObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
-        overlayView,
-        FriendlyObstructionPurpose.OTHER,
-        "This is transparent overlays"
-    );
-    friendlyObstructionList.add(overlaysObstruction);
+//    FriendlyObstruction overlaysObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
+//        overlayView,
+//        FriendlyObstructionPurpose.OTHER,
+//        "This is transparent overlays"
+//    );
+//    friendlyObstructionList.add(overlaysObstruction);
 
     DefaultHttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory();
     httpDataSourceFactory.setUserAgent(userAgent);
