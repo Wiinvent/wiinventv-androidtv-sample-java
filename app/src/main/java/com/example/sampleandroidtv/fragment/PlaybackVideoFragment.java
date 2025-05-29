@@ -171,14 +171,14 @@ public class PlaybackVideoFragment extends Fragment {
 
   private void initializePlayer() {
     //1. Khởi tạo InStreamManager
-    InStreamManager.Companion.getInstance().init(requireContext(), SAMPLE_TENANT_ID, DeviceType.TV, Environment.PRODUCTION, 5, 1, 5, 2500, LevelLog.BODY,true, 8);
+    InStreamManager.Companion.getInstance().init(requireContext(), "4", DeviceType.TV, Environment.PRODUCTION, 5, 10, 5, 2500, LevelLog.BODY,true, 8);
 
     String userAgent = Util.getUserAgent(requireContext(), "Exo");
 
     exoPlayer = new ExoPlayer.Builder(requireContext()).build();
     playerView.setPlayer(exoPlayer);
 
-    String contentUrl = "https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8";
+    String contentUrl = "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8";
 
     //2. Thêm WiAdsLoaderListener
     InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
@@ -222,7 +222,7 @@ public class PlaybackVideoFragment extends Fragment {
     //3. Khởi tạo AdsRequestData
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
         .channelId("998989,222222") // danh sách id của category của nội dung & cách nhau bằng dấu ,
-        .streamId("999999") // id nội dung
+        .streamId("179") // id nội dung
         .transId("222222") // Transaction cua TV360
         .contentType(ContentType.FILM) // content type TV | FILM | VIDEO
         .title("Tieu de cua noi dung") // tiêu đề nội dung
