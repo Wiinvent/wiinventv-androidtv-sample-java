@@ -22,7 +22,7 @@ implementation 'tv.wiinvent:wiinvent-sdk-android:1.2.0'
 #### 2. Sử dụng
 
 Khởi tạo SDK với một vài bước như sau:
-1. Cấu hình layout với: playerView cho player hiển thị nội dung, FriendlyPlayerView cho player hiển tvc quảng cáo, TV360SkipAdsButtonAds nút bỏ qua
+1. Cấu hình layout với: PlayerView cho player hiển thị nội dung, FriendlyPlayerView cho player hiển tvc quảng cáo, TV360SkipAdsButtonAds nút bỏ qua
 2. Khởi tạo InStreamManager với một số các tham được mô tả ở dưới
 3. Thêm WiAdsLoaderListener để lắng nghe một số các event, lỗi và ẩn hiện nút bỏ qua, xử lý logic show/hide (pause/resume) của player nội dung và player của tvc quảng cáo
 4. Khởi tạo AdsRequestData với channelId, streamId cùng các tham số khác (mô tả ở phía dưới)
