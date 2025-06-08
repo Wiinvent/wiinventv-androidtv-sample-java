@@ -16,6 +16,7 @@ import tv.wiinvent.androidtv.logging.LevelLog;
 import tv.wiinvent.androidtv.models.ads.WelcomeAdsRequestData;
 import tv.wiinvent.androidtv.models.type.DeviceType;
 import tv.wiinvent.androidtv.models.type.Environment;
+import tv.wiinvent.androidtv.models.type.Gender;
 import tv.wiinvent.androidtv.ui.welcomead.WelcomeAdView;
 
 /*
@@ -89,6 +90,8 @@ public class MainActivity extends FragmentActivity {
 
     WelcomeAdsRequestData adsRequestData = new WelcomeAdsRequestData.Builder()
         .transId("22222") // mã giao dịch tạo từ server đối tác - client liên hệ server
+        .age(30)
+        .gender(Gender.FEMALE)
         .uid20("") // unified id 2.0, nếu không có thì set ""
         .segments("123,12,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
         .build();
