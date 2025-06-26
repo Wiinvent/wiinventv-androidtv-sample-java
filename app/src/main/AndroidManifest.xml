@@ -42,6 +42,19 @@
     <activity
       android:name=".activity.BrowseErrorActivity"
       android:exported="false" />
-  </application>
 
+    <meta-data
+        android:name="BITMOVIN_PLAYER_LICENSE_KEY"
+        android:value="22a5430e-a8cc-46d3-98b1-e64808844d87" />
+  </application>
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <data android:scheme="https" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <data android:scheme="http" />
+    </intent>
+  </queries>
 </manifest>

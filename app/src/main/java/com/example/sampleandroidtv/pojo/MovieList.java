@@ -26,11 +26,8 @@ public final class MovieList {
   public static List<Movie> setupMovies() {
     list = new ArrayList<>();
     String title[] = {
-        "Zeitgeist 2010_ Year in Review",
-        "Google Demo Slam_ 20ft Search",
-        "Introducing Gmail Blue",
-        "Introducing Google Fiber to the Pole",
-        "Introducing Google Nose"
+        "ExoPlayer",
+        "Bitmovin"
     };
 
     String description = "Fusce id nisi turpis. Praesent viverra bibendum semper. "
