@@ -41,7 +41,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     //Ham nay init onCreate
-//    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 5, 1, 5, 2500, LevelLog.BODY,true, 8);
+    InStreamManager.Companion.getInstance().init(this, SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 5, 1, 5, 2500, LevelLog.BODY,true, 8);
 
     //init welcome
     welcomeAdView = findViewById(R.id.welcome_ad_view);
@@ -98,8 +98,8 @@ public class MainActivity extends FragmentActivity {
 
     AdsWelcomeManager.Companion.getInstance().requestAds(this,
     R.id.welcome_ad_view,
-        R.layout.wisdk_welcome_tvc_detail,
-        R.id.wisdk_exo_player_view,
+        R.layout.wisdk_welcome_tvc_detail, // anh check lại file này nhé
+        R.id.wisdk_exo_player_view, //cai nay la id cua player giả trong cái layout wisdk_welcome_tvc_detail
         R.id.wisdk_ad_player_view,
         R.id.wisdk_skip_button,
         "Bỏ qua quảng cáo",

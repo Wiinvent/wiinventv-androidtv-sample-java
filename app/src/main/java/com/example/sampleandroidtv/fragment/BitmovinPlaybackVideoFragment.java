@@ -150,8 +150,8 @@ public class BitmovinPlaybackVideoFragment extends Fragment {
 //  }
 
   private void initializePlayer() {
-    // 2. Khởi tạo InStreamManager
-    InStreamManager.Companion.getInstance().init(requireContext(), SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 5, 5, 5, 2500, LevelLog.BODY,true, 8);
+    // 2. Khởi tạo InStreamManager ham khoi tao nay khoi tao som o MainActivity
+//    InStreamManager.Companion.getInstance().init(requireContext(), SAMPLE_ACCOUNT_ID, DeviceType.TV, Environment.SANDBOX, 5, 5, 5, 2500, LevelLog.BODY,true, 8);
 
     player = PlayerFactory.create(requireContext(), new PlayerConfig(), new AnalyticsConfig(analyticsLicenseKey));
     playerView.setPlayer(player);
