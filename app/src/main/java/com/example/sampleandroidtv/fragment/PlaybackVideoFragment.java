@@ -171,7 +171,7 @@ public class PlaybackVideoFragment extends Fragment {
 
   private void initializePlayer() {
     //1. Khởi tạo InStreamManager
-    InStreamManager.Companion.getInstance().init(requireContext(), "4", DeviceType.TV, Environment.PRODUCTION, 5, 10, 5, 2500, LevelLog.BODY,true, 8);
+    InStreamManager.Companion.getInstance().init(requireContext(), "14", DeviceType.TV, Environment.SANDBOX, 5, 10, 5, 2500, LevelLog.BODY, 8);
 
     String userAgent = Util.getUserAgent(requireContext(), "Exo");
 
@@ -222,7 +222,7 @@ public class PlaybackVideoFragment extends Fragment {
     //3. Khởi tạo AdsRequestData
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
         .channelId("998989,222222") // danh sách id của category của nội dung & cách nhau bằng dấu ,
-        .streamId("179") // id nội dung
+        .streamId("135911") // id nội dung
         .transId("222222") // Transaction cua TV360
         .contentType(ContentType.FILM) // content type TV | FILM | VIDEO
         .title("Tieu de cua noi dung") // tiêu đề nội dung

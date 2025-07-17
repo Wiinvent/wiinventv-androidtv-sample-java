@@ -10,10 +10,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
 
-<!--  <tv.wiinvent.androidtv.ui.OverlayView-->
-<!--    android:id="@+id/wisdk_overlay_view"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent" />-->
+  <tv.wiinvent.androidtv.ui.OverlayView
+    android:id="@+id/wisdk_overlay_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
 
   <!--<Button-->
   <!--  android:layout_width="wrap_content"-->
