@@ -42,14 +42,18 @@ public class MainActivity extends FragmentActivity {
     //Ham nay init onCreate
 //    InStreamManager.Companion.getInstance().init(this, SAMPLE_TENANT_ID, DeviceType.TV, Environment.SANDBOX, 5, 1, 5, 2500, LevelLog.BODY,true, 8);
 
+    initWelcome();
+  }
+
+  private void initWelcome() {
     //init welcome
     welcomeAdView = findViewById(R.id.welcome_ad_view);
 
     //Welcome
     AdsWelcomeManager.Companion.getInstance()
-        .init(this, SAMPLE_TENANT_ID, DeviceType.TV, Environment.SANDBOX,
-            5, 5,
-            5,  2500, "", 6, true);
+            .init(this, SAMPLE_TENANT_ID, DeviceType.TV, Environment.SANDBOX,
+                    5, 5,
+                    5,  2500, "", 6, true);
 
     AdsWelcomeManager.Companion.getInstance().addWelcomeListener(new WelcomeAdsEventListener() {
       @Override
@@ -88,19 +92,19 @@ public class MainActivity extends FragmentActivity {
     });
 
     WelcomeAdsRequestData adsRequestData = new WelcomeAdsRequestData.Builder()
-        .transId("22222") // mã giao dịch tạo từ server đối tác - client liên hệ server
-        .uid20("") // unified id 2.0, nếu không có thì set ""
-        .segments("123,12,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
-        .build();
+            .transId("22222") // mã giao dịch tạo từ server đối tác - client liên hệ server
+            .uid20("") // unified id 2.0, nếu không có thì set ""
+            .segments("123,12,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
+            .build();
 
     AdsWelcomeManager.Companion.getInstance().requestAds(this,
-    R.id.welcome_ad_view,
-        R.layout.wisdk_welcome_tvc_detail,
-        R.id.wisdk_exo_player_view,
-        R.id.wisdk_skip_button,
-        "Bỏ qua quảng cáo",
-        R.drawable.skip_icon_button,
-        adsRequestData);
+            R.id.welcome_ad_view,
+            R.layout.wisdk_welcome_tvc_detail,
+            R.id.wisdk_exo_player_view,
+            R.id.wisdk_skip_button,
+            "Bỏ qua quảng cáo",
+            R.drawable.skip_icon_button,
+            adsRequestData);
   }
 
   @Override
