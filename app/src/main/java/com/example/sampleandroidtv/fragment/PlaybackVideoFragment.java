@@ -222,7 +222,7 @@ public class PlaybackVideoFragment extends Fragment {
     //3. Khởi tạo AdsRequestData
     AdsRequestData adsRequestData = new AdsRequestData.Builder()
         .channelId("998989,222222") // danh sách id của category của nội dung & cách nhau bằng dấu ,
-        .streamId("135911") // id nội dung
+        .streamId("7600") // id nội dung
         .transId("222222") // Transaction cua TV360
         .contentType(ContentType.FILM) // content type TV | FILM | VIDEO
         .title("Tieu de cua noi dung") // tiêu đề nội dung
