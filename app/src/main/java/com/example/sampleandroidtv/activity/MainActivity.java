@@ -52,15 +52,15 @@ public class MainActivity extends FragmentActivity {
     //Welcome
     AdsWelcomeManager.Companion.getInstance()
             .init(this,
-                    SAMPLE_TENANT_ID, // tenant id giống với instream (lấy config từ backend)
+                    SAMPLE_TENANT_ID, // tenant id giống với instream, phụ thuộc vào môi trường (prod|sandbox) có thể khác nhau (lấy config từ backend)
                     DeviceType.TV,  // cố định là TV
                     Environment.SANDBOX,  // môi truòng prod | sandbox
                     5, // load vast timeout (lấy config từ backend)
                     5, // load media timeout (lấy config từ backend)
-                    5,  // buffer media timeout (lấy config từ backend)
+                    5, // buffer media timeout (lấy config từ backend)
                     2500, // max bitrate (lấy config từ backend)
                     "",
-                    6, // thời gian bo qua quang cao welcome
+                    8, // thời gian bo qua quang cao welcome
                     true); // debug
 
     AdsWelcomeManager.Companion.getInstance().addWelcomeListener(new WelcomeAdsEventListener() {
