@@ -18,7 +18,7 @@
     android:label="@string/app_name"
     android:supportsRtl="true"
     android:usesCleartextTraffic="true"
-    android:theme="@style/Theme.SampleAndroidTV">
+    android:theme="@style/AppTheme">
     <activity
       android:launchMode="singleInstance"
       android:name=".activity.MainActivity"
@@ -42,6 +42,12 @@
       android:exported="false" />
     <activity
       android:name=".activity.BrowseErrorActivity"
+      android:exported="false" />
+    <activity
+      android:name=".activity.OverlayBannerActivity"
+      android:exported="false" />
+    <activity
+      android:name=".activity.DisplayBannerActivity"
       android:exported="false" />
   </application>
 

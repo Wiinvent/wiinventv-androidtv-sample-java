@@ -35,6 +35,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.sampleandroidtv.activity.DisplayBannerActivity;
+import com.example.sampleandroidtv.activity.OverlayBannerActivity;
 import com.example.sampleandroidtv.presenter.CardPresenter;
 import com.example.sampleandroidtv.pojo.Movie;
 import com.example.sampleandroidtv.pojo.MovieList;
@@ -53,8 +55,8 @@ public class MainFragment extends BrowseSupportFragment {
   private static final int BACKGROUND_UPDATE_DELAY = 300;
   private static final int GRID_ITEM_WIDTH = 200;
   private static final int GRID_ITEM_HEIGHT = 200;
-  private static final int NUM_ROWS = 6;
-  private static final int NUM_COLS = 15;
+  private static final int NUM_ROWS = 1;
+  private static final int NUM_COLS = 2;
 
   private final Handler mHandler = new Handler(Looper.myLooper());
   private Drawable mDefaultBackground;
@@ -99,7 +101,7 @@ public class MainFragment extends BrowseSupportFragment {
       }
       ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
       for (int j = 0; j < NUM_COLS; j++) {
-        listRowAdapter.add(list.get(j % 5));
+        listRowAdapter.add(list.get(j % 2));
       }
       HeaderItem header = new HeaderItem(i, MovieList.MOVIE_CATEGORY[i]);
       rowsAdapter.add(new ListRow(header, listRowAdapter));
@@ -109,6 +111,8 @@ public class MainFragment extends BrowseSupportFragment {
 
     GridItemPresenter mGridPresenter = new GridItemPresenter();
     ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
+    gridRowAdapter.add(getResources().getString(R.string.test_display_banner));
+    gridRowAdapter.add(getResources().getString(R.string.test_overlay_banner));
     gridRowAdapter.add(getResources().getString(R.string.grid_view));
     gridRowAdapter.add(getString(R.string.error_fragment));
     gridRowAdapter.add(getResources().getString(R.string.personal_settings));
@@ -198,7 +202,13 @@ public class MainFragment extends BrowseSupportFragment {
             .toBundle();
         getActivity().startActivity(intent, bundle);
       } else if (item instanceof String) {
-        if (((String) item).contains(getString(R.string.error_fragment))) {
+        if (((String) item).contains(getString(R.string.test_display_banner))) {
+          Intent intent = new Intent(getActivity(), DisplayBannerActivity.class);
+          startActivity(intent);
+        } else if (((String) item).contains(getString(R.string.test_overlay_banner))) {
+          Intent intent = new Intent(getActivity(), OverlayBannerActivity.class);
+          startActivity(intent);
+        } else if (((String) item).contains(getString(R.string.error_fragment))) {
           Intent intent = new Intent(getActivity(), BrowseErrorActivity.class);
           startActivity(intent);
         } else {

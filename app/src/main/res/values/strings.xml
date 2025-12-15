@@ -12,6 +12,9 @@
   <string name="buy_1">Buy and Own</string>
   <string name="buy_2">AT $9.99</string>
   <string name="movie">Movie</string>
+  <string name="test_display_banner">Test Display Banner</string>
+  <string name="test_overlay_banner">Test Overlay Banner</string>
+
 
   <!-- Error messages -->
   <string name="error_fragment_message">An error occurred</string>
