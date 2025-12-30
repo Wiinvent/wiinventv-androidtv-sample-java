@@ -135,7 +135,7 @@ public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdap
 
             DisplayBannerManager.Companion.getInstance().requestAds(
                     activity,
-                    viewId,
+                    bannerAdView,
                     bannerAdsRequestData
             );
 
