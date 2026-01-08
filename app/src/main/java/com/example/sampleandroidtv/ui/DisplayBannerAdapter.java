@@ -73,6 +73,12 @@ public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdap
         }
     }
 
+    @Override
+    public void onViewRecycled(@NonNull DisplayBannerViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.recycled();
+    }
+
     class DisplayBannerViewHolder extends RecyclerView.ViewHolder {
         private ConstraintLayout ctlBanner;
         private TextView tvTitle;
@@ -97,6 +103,12 @@ public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdap
             bannerAdView.setLayoutParams(layoutParams);
             ctlBanner.addView(bannerAdView);
 
+        }
+
+        void recycled() {
+            if(bannerAdView != null) {
+                DisplayBannerManager.Companion.getInstance().releaseBanner(bannerAdView);
+            }
         }
 
         void bind(Pair<String, BannerDisplayAdSize> params ) {

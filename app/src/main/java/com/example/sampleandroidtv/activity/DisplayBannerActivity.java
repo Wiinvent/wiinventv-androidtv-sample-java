@@ -34,7 +34,7 @@ public class DisplayBannerActivity extends FragmentActivity {
     private String channelIdDefault = "998989";
     private String streamIdDefault = "999999";
     private String positionIdDefault = "homepage1";
-    private BannerDisplayAdSize adSize = BannerDisplayAdSize.LARGE_BANNER;
+    private BannerDisplayAdSize adSize = BannerDisplayAdSize.HOMEPAGE_BANNER;
 
     private static final String CONTENT_URL = "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8";
 
@@ -80,20 +80,20 @@ public class DisplayBannerActivity extends FragmentActivity {
     }
 
     public void initBannerList() {
-        bannerParams.add(new Pair("homepage1", BannerDisplayAdSize.LARGE_BANNER));
-        bannerParams.add(new Pair("subpage1", BannerDisplayAdSize.MEDIUM_BANNER));
-        bannerParams.add(new Pair("homepage2", BannerDisplayAdSize.LARGE_BANNER));
-        bannerParams.add(new Pair("subpage2", BannerDisplayAdSize.MEDIUM_BANNER));
-        bannerParams.add(new Pair("homepage3", BannerDisplayAdSize.LARGE_BANNER));
-        bannerParams.add(new Pair("subpage3", BannerDisplayAdSize.MEDIUM_BANNER));
-        bannerParams.add(new Pair("homepage4", BannerDisplayAdSize.LARGE_BANNER));
-        bannerParams.add(new Pair("subpage4", BannerDisplayAdSize.MEDIUM_BANNER));
-        bannerParams.add(new Pair("homepage5", BannerDisplayAdSize.LARGE_BANNER));
-        bannerParams.add(new Pair("subpage5", BannerDisplayAdSize.MEDIUM_BANNER));
-        bannerParams.add(new Pair("homepage6", BannerDisplayAdSize.LARGE_BANNER));
-        bannerParams.add(new Pair("subpage6", BannerDisplayAdSize.MEDIUM_BANNER));
-        bannerParams.add(new Pair("homepage7", BannerDisplayAdSize.LARGE_BANNER));
-        bannerParams.add(new Pair("subpage7", BannerDisplayAdSize.MEDIUM_BANNER));
+        bannerParams.add(new Pair("HOME_0", BannerDisplayAdSize.HOMEPAGE_BANNER));
+        bannerParams.add(new Pair("subpage1", BannerDisplayAdSize.SUBPAGE_BANNER));
+        bannerParams.add(new Pair("HOME_1", BannerDisplayAdSize.HOMEPAGE_BANNER));
+        bannerParams.add(new Pair("subpage2", BannerDisplayAdSize.SUBPAGE_BANNER));
+        bannerParams.add(new Pair("HOME_2", BannerDisplayAdSize.HOMEPAGE_BANNER));
+        bannerParams.add(new Pair("subpage3", BannerDisplayAdSize.SUBPAGE_BANNER));
+        bannerParams.add(new Pair("HOME_3", BannerDisplayAdSize.HOMEPAGE_BANNER));
+        bannerParams.add(new Pair("subpage4", BannerDisplayAdSize.SUBPAGE_BANNER));
+        bannerParams.add(new Pair("HOME_4", BannerDisplayAdSize.HOMEPAGE_BANNER));
+        bannerParams.add(new Pair("subpage5", BannerDisplayAdSize.SUBPAGE_BANNER));
+        bannerParams.add(new Pair("homepage6", BannerDisplayAdSize.HOMEPAGE_BANNER));
+        bannerParams.add(new Pair("subpage6", BannerDisplayAdSize.SUBPAGE_BANNER));
+        bannerParams.add(new Pair("homepage7", BannerDisplayAdSize.HOMEPAGE_BANNER));
+        bannerParams.add(new Pair("subpage7", BannerDisplayAdSize.SUBPAGE_BANNER));
     }
     private void initDisplayBannerManager() {
 
@@ -119,7 +119,7 @@ public class DisplayBannerActivity extends FragmentActivity {
 
             @Override
             public void onNoAds(String positionId, BannerAdView adView) {
-                Log.d(TAG, "=========DisplayBannerManager khong co ads de show 1");
+                Log.d(TAG, "=========DisplayBannerManager khong co ads de show: " + positionId);
             }
 
             @Override
