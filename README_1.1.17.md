@@ -1,5 +1,5 @@
 
-### Version 1.1.15
+### Version 1.1.17
 Change log: Update adSize for DisplayBanner
 DisplayBanner will use BannerDisplayAdSize.HOMEPAGE_BANNER for homepage instead of LARGE_BANNER
 and BannerDisplayAdSize.SUBPAGE_BANNER for subpage instead of MEDIUM_BANNER
@@ -244,11 +244,11 @@ Clean up khi recycle view holder để sử dụng lại bannerAdView
 
 2. Constant
 
-| Key         | Description                                                                                                                                          |
-|:------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| env         | Environment.SANDBOX <br/> WI.Environment.PRODUCTION                                                                                                  |
-| contentType | ContentType.TV <br/>WI.ContentType.FILM <br/>WI.ContentType.VIDEO <br/>WI.ContentType.SHORT_VOD                                                      |
-| gender      | Gender.MALE <br/>WI.Gender.FEMALE <br/>WI.Gender.OTHER <br/>WI.Gender.NONE                                                                           |
-| logLevel    | LevelLog.NONE <br/> LevelLog.BODY                                                                                                                    |
-| adSize      | BannerDisplayAdSize.MEDIUM_BANNER (display banner) <br/> BannerAdSize.LARGE_BANNER (display banner) <br/> BannerAdSize.PAUSE_BANNER (overlay banner) |
+| Key         | Description                                                                                                                                                                         |
+|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| env         | Environment.SANDBOX <br/> WI.Environment.PRODUCTION                                                                                                                                 |
+| contentType | ContentType.TV <br/>WI.ContentType.FILM <br/>WI.ContentType.VIDEO <br/>WI.ContentType.SHORT_VOD                                                                                     |
+| gender      | Gender.MALE <br/>WI.Gender.FEMALE <br/>WI.Gender.OTHER <br/>WI.Gender.NONE                                                                                                          |
+| logLevel    | LevelLog.NONE <br/> LevelLog.BODY                                                                                                                                                   |
+| adSize      | BannerDisplayAdSize.SUBPAGE_BANNER (display banner for sub page) <br/> BannerAdSize.HOMEPAGE_BANNER (display banner for home page) <br/> BannerAdSize.PAUSE_BANNER (overlay banner) |
 
