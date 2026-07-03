@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.example.sampleandroidtv.R;
 import com.example.sampleandroidtv.activity.DetailsActivity;
 import com.example.sampleandroidtv.pojo.Movie;
+import com.example.sampleandroidtv.ui.TV360ReportAdsButton;
 import com.example.sampleandroidtv.ui.TV360SkipAdsButtonAds;
 import com.example.sampleandroidtv.util.VideoCache;
 import com.google.ads.interactivemedia.v3.api.FriendlyObstruction;
@@ -85,6 +86,7 @@ public class PlaybackVideoFragment extends Fragment {
 
   private OverlayView overlayView;
   private TV360SkipAdsButtonAds skipButton;
+  private TV360ReportAdsButton reportButton;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -105,6 +107,7 @@ public class PlaybackVideoFragment extends Fragment {
     super.onViewCreated(view, savedInstanceState);
     playerView = requireActivity().findViewById(R.id.simple_exo_player_view);
     skipButton = requireActivity().findViewById(R.id.skip_button);
+    reportButton = requireActivity().findViewById(R.id.instream_report_button);
     overlayView = requireActivity().findViewById(R.id.wisdk_overlay_view);
     init(savedInstanceState);
   }
@@ -209,6 +212,18 @@ public class PlaybackVideoFragment extends Fragment {
       }
 
       @Override
+      public void showReportButton(@NonNull String campaignId) {
+        if(reportButton != null)
+          reportButton.show(getActivity()); //hien nut bao cao khi co quang cao
+      }
+
+      @Override
+      public void hideReportButton(@NonNull String campaignId) {
+        if(reportButton != null)
+          reportButton.hide();
+      }
+
+      @Override
       public void onError() {
         InStreamManager.Companion.getInstance().release();
       }
@@ -228,7 +243,8 @@ public class PlaybackVideoFragment extends Fragment {
         .title("Tieu de cua noi dung") // tiêu đề nội dung
         .category("category 1, category 2") // danh sach tiêu đề category của nội dung & cách nhau bằng dấu ,
         .keyword("keyword 1, keyword 2") // từ khoá nếu có | để "" nếu ko có
-        .uid20("") // unified id 2.0, nếu không có thì set ""
+        .uid("123123123") // định danh người dùng (unified id), để "" nếu không có
+        .userImpressionLimit(5) // giới hạn số lần hiển thị / người dùng (0 = không giới hạn)
         .segments("123,1,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
         .build();
 
@@ -248,6 +264,16 @@ public class PlaybackVideoFragment extends Fragment {
     );
     friendlyObstructionList.add(overlaysObstruction);
 
+    //nut bao cao phu len tren player => cung phai khai bao friendly obstruction
+    if(reportButton != null) {
+      FriendlyObstruction reportButtonObstruction = InStreamManager.Companion.getInstance().createFriendlyObstruction(
+          reportButton,
+          FriendlyObstructionPurpose.OTHER,
+          "This is report button"
+      );
+      friendlyObstructionList.add(reportButtonObstruction);
+    }
+
     if(playerView != null) {
       playerView.addFriendlyObstructionList(friendlyObstructionList);
     }
@@ -266,7 +292,8 @@ public class PlaybackVideoFragment extends Fragment {
                 mediaSource,
                 playerView,
                 exoPlayer,
-                defaultMediaSourceFactory);
+                defaultMediaSourceFactory,
+                reportButton); // nút báo cáo quảng cáo (1.1.24)
 
     exoPlayer.addMediaSource(adsMediaSource);
     exoPlayer.prepare();

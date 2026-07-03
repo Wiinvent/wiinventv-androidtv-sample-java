@@ -190,7 +190,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment {
     Collections.shuffle(list);
     ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
     for (int j = 0; j < NUM_COLS; j++) {
-      listRowAdapter.add(list.get(j % 5));
+      listRowAdapter.add(list.get(j % list.size())); // wrap theo size thật, tránh crash khi catalog < 5 phim
     }
 
     HeaderItem header = new HeaderItem(0, subcategories[0]);

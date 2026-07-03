@@ -33,6 +33,7 @@ import tv.wiinvent.androidtv.models.ads.DisplayBannerAdsRequestData;
 import tv.wiinvent.androidtv.models.type.BannerDisplayAdSize;
 import tv.wiinvent.androidtv.models.type.BannerDisplayType;
 import tv.wiinvent.androidtv.models.type.Environment;
+import tv.wiinvent.androidtv.report.ReportButtonAds;
 import tv.wiinvent.androidtv.ui.banner.BannerAdView;
 
 public class OverlayBannerActivity extends FragmentActivity {
@@ -40,6 +41,7 @@ public class OverlayBannerActivity extends FragmentActivity {
 
     private PlayerView playerView = null;
     private ExoPlayer player = null;
+    private ReportButtonAds reportButton = null;
 
     private String channelIdDefault = "998989";
     private String streamIdDefault = "999999";
@@ -54,6 +56,7 @@ public class OverlayBannerActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overlays_banner);
         playerView = findViewById(R.id.player_view);
+        reportButton = findViewById(R.id.overlay_report_button);
 
 //        Objects.requireNonNull(getSupportActionBar()).hide();
 
@@ -84,7 +87,7 @@ public class OverlayBannerActivity extends FragmentActivity {
 
         OverlayBannerManager.Companion.getInstance().addBannerListener(new BannerAdEventListener() {
             @Override
-            public void onDisplayAds(String positionId, BannerAdView adView) {
+            public void onDisplayAds(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
                 Log.d(TAG, "=========OverlayBannerManager onDisplayAds");
 
                 runOnUiThread(() -> {
@@ -100,25 +103,25 @@ public class OverlayBannerActivity extends FragmentActivity {
             }
 
             @Override
-            public void onAdsBannerDismiss(String positionId, BannerAdView adView) {
+            public void onAdsBannerDismiss(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
                 Log.d(TAG, "=========OverlayBannerManager onAdsBannerDismiss");
 
                 runOnUiThread(() -> {
                     if (adView != null) {
                         adView.setVisibility(View.GONE);
-                        OverlayBannerManager.Companion.getInstance().releaseBanner(adView);
+                        OverlayBannerManager.Companion.getInstance().releaseBanner(adView, reportButton);
                     }
                 });
             }
 
             @Override
-            public void onAdsBannerError(String positionId, BannerAdView adView) {
+            public void onAdsBannerError(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
                 Log.d(TAG, "=========OverlayBannerManager onAdsWelcomeError");
 
                 runOnUiThread(() -> {
                     if (adView != null) {
                         adView.setVisibility(View.GONE);
-                        OverlayBannerManager.Companion.getInstance().releaseBanner(adView);
+                        OverlayBannerManager.Companion.getInstance().releaseBanner(adView, reportButton);
                     }
                 });
             }
@@ -126,6 +129,26 @@ public class OverlayBannerActivity extends FragmentActivity {
             @Override
             public void onAdsBannerClick(String positionId, String clickThroughLink) {
                 Log.d(TAG, "=========OverlayBannerManager onAdsBannerClick " + clickThroughLink);
+            }
+
+            @Override
+            public void onShowReportButton(String positionId, ReportButtonAds reportButton) {
+                Log.d(TAG, "=========OverlayBannerManager onShowReportButton");
+                runOnUiThread(() -> {
+                    if (reportButton != null) {
+                        reportButton.show(OverlayBannerActivity.this);
+                    }
+                });
+            }
+
+            @Override
+            public void onHideReportButton(String positionId, ReportButtonAds reportButton) {
+                Log.d(TAG, "=========OverlayBannerManager onHideReportButton");
+                runOnUiThread(() -> {
+                    if (reportButton != null) {
+                        reportButton.hide();
+                    }
+                });
             }
         });
     }
@@ -172,7 +195,7 @@ public class OverlayBannerActivity extends FragmentActivity {
 
     public void dismissOverlayBanner() {
         BannerAdView bannerView = findViewById(R.id.banner_ad_overlay_view);
-        OverlayBannerManager.Companion.getInstance().releaseBanner(bannerView);
+        OverlayBannerManager.Companion.getInstance().releaseBanner(bannerView, reportButton);
     }
 
     public void showDisplayBanner(
@@ -192,7 +215,8 @@ public class OverlayBannerActivity extends FragmentActivity {
                         .transId("1112222222")
                         // .age(30)
                         // .gender(Gender.FEMALE)
-                        .uid20("123123123")
+                        .uid("123123123")
+                        .userImpressionLimit(5) // giới hạn số lần hiển thị / người dùng (0 = không giới hạn)
                         .color("#ffffff00")
                         .segments("a3,34,d3,d3")
                         .positionId(positionId)
@@ -203,7 +227,8 @@ public class OverlayBannerActivity extends FragmentActivity {
                 this,
                 bannerAdView,
                 bannerAdsRequestData,
-                30
+                30, // cacheTimeSec: thời gian cache dữ liệu quảng cáo (giây)
+                reportButton // nút báo cáo quảng cáo (1.1.24)
         );
     }
 

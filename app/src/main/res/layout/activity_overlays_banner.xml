@@ -47,6 +47,18 @@
             android:layout_marginHorizontal="20dp"
             />
 
+        <!-- Nút báo cáo quảng cáo (1.1.24) - SDK tự bật khi có quảng cáo -->
+        <com.example.sampleandroidtv.ui.TV360ReportAdsButton
+            android:id="@+id/overlay_report_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintTop_toTopOf="@id/banner_ad_overlay_view"
+            app:layout_constraintEnd_toEndOf="@id/banner_ad_overlay_view"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            android:gravity="center" />
+
         <Button
             android:id="@+id/overlay_banner"
             android:layout_width="wrap_content"

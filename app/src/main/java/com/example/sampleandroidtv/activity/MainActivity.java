@@ -101,7 +101,8 @@ public class MainActivity extends FragmentActivity {
 
     WelcomeAdsRequestData adsRequestData = new WelcomeAdsRequestData.Builder()
             .transId("22222") // mã giao dịch tạo từ server đối tác - client liên hệ server
-            .uid20("") // unified id 2.0, nếu không có thì set ""
+            .uid("123123123") // định danh người dùng (unified id), để "" nếu không có
+            .userImpressionLimit(5) // giới hạn số lần hiển thị / người dùng (0 = không giới hạn)
             .segments("123,12,23") //segment id của user phân tách nhau bời, dữ liệu này lấy từ backend đối tác
             .build();
 
@@ -112,7 +113,8 @@ public class MainActivity extends FragmentActivity {
             R.id.wisdk_skip_button,
             "Bỏ qua quảng cáo",
             R.drawable.skip_icon_button,
-            adsRequestData);
+            adsRequestData,
+            R.id.wisdk_report_button); // id nút báo cáo trong layout TVC (1.1.24)
   }
 
   @Override

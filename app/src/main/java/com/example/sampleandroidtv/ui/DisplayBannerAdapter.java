@@ -83,6 +83,7 @@ public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdap
         private ConstraintLayout ctlBanner;
         private TextView tvTitle;
         private BannerAdView bannerAdView;
+        private TV360ReportAdsButton reportButton;
 
         public DisplayBannerViewHolder(View itemView) {
             super(itemView);
@@ -103,6 +104,17 @@ public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdap
             bannerAdView.setLayoutParams(layoutParams);
             ctlBanner.addView(bannerAdView);
 
+            // nút báo cáo (1.1.24) - tạo per-row, neo góc trên-phải của banner; SDK tự show/hide
+            reportButton = new TV360ReportAdsButton(itemView.getContext());
+            reportButton.setId(generateViewId());
+            ConstraintLayout.LayoutParams reportParams = new ConstraintLayout.LayoutParams(60, 60);
+            reportParams.topToTop = bannerAdView.getId();
+            reportParams.endToEnd = bannerAdView.getId();
+            reportParams.rightMargin = 10;
+            reportParams.topMargin = 10;
+            reportButton.setLayoutParams(reportParams);
+            reportButton.setVisibility(View.GONE);
+            ctlBanner.addView(reportButton);
         }
 
         void recycled() {
@@ -138,7 +150,8 @@ public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdap
                             .transId("1112222222")
                             // .age(30)
                             // .gender(Gender.FEMALE)
-                            .uid20("123123123")
+                            .uid("123123123")
+                            .userImpressionLimit(5) // giới hạn số lần hiển thị / người dùng (0 = không giới hạn)
                             .color("#ffffff00")
                             .segments("a3,34,d3,d3")
                             .positionId(positionId)
@@ -148,6 +161,7 @@ public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdap
             DisplayBannerManager.Companion.getInstance().requestAds(
                     activity,
                     bannerAdView,
+                    reportButton, // nút báo cáo quảng cáo (1.1.24)
                     bannerAdsRequestData
             );
 

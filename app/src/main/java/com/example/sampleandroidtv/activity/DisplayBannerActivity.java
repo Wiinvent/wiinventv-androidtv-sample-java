@@ -26,6 +26,7 @@ import tv.wiinvent.androidtv.models.ads.DisplayBannerAdsRequestData;
 import tv.wiinvent.androidtv.models.type.BannerDisplayAdSize;
 import tv.wiinvent.androidtv.models.type.BannerDisplayType;
 import tv.wiinvent.androidtv.models.type.Environment;
+import tv.wiinvent.androidtv.report.ReportButtonAds;
 import tv.wiinvent.androidtv.ui.banner.BannerAdView;
 
 public class DisplayBannerActivity extends FragmentActivity {
@@ -107,7 +108,7 @@ public class DisplayBannerActivity extends FragmentActivity {
 
         DisplayBannerManager.Companion.getInstance().addBannerListener(new BannerAdEventListener() {
             @Override
-            public void onDisplayAds(String positionId, BannerAdView adView) {
+            public void onDisplayAds(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
                 Log.d(TAG, "=========DisplayBannerManager onDisplayAds");
 
                 runOnUiThread(() -> {
@@ -123,7 +124,7 @@ public class DisplayBannerActivity extends FragmentActivity {
             }
 
             @Override
-            public void onAdsBannerDismiss(String positionId, BannerAdView adView) {
+            public void onAdsBannerDismiss(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
                 Log.d(TAG, "=========DisplayBannerManager onAdsBannerDismiss");
 
                 runOnUiThread(() -> {
@@ -135,7 +136,7 @@ public class DisplayBannerActivity extends FragmentActivity {
             }
 
             @Override
-            public void onAdsBannerError(String positionId, BannerAdView adView) {
+            public void onAdsBannerError(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
                 Log.d(TAG, "=========DisplayBannerManager onAdsWelcomeError");
 
                 runOnUiThread(() -> {
@@ -149,6 +150,26 @@ public class DisplayBannerActivity extends FragmentActivity {
             @Override
             public void onAdsBannerClick(String positionId, String clickThroughLink) {
                 Log.d(TAG, "=========DisplayBannerManager onAdsBannerClick " + clickThroughLink);
+            }
+
+            @Override
+            public void onShowReportButton(String positionId, ReportButtonAds reportButton) {
+                Log.d(TAG, "=========DisplayBannerManager onShowReportButton");
+                runOnUiThread(() -> {
+                    if (reportButton != null) {
+                        reportButton.show(DisplayBannerActivity.this);
+                    }
+                });
+            }
+
+            @Override
+            public void onHideReportButton(String positionId, ReportButtonAds reportButton) {
+                Log.d(TAG, "=========DisplayBannerManager onHideReportButton");
+                runOnUiThread(() -> {
+                    if (reportButton != null) {
+                        reportButton.hide();
+                    }
+                });
             }
         });
     }
@@ -180,7 +201,8 @@ public class DisplayBannerActivity extends FragmentActivity {
                         .transId("1112222222")
                         // .age(30)
                         // .gender(Gender.FEMALE)
-                        .uid20("123123123")
+                        .uid("123123123")
+                        .userImpressionLimit(5) // giới hạn số lần hiển thị / người dùng (0 = không giới hạn)
                         .color("#ffffff00")
                         .segments("a3,34,d3,d3")
                         .positionId(positionId)
@@ -190,6 +212,7 @@ public class DisplayBannerActivity extends FragmentActivity {
         DisplayBannerManager.Companion.getInstance().requestAds(
                 this,
                 bannerAdView,
+                null, // nút báo cáo (tạo per-row trong DisplayBannerAdapter)
                 bannerAdsRequestData
         );
     }
