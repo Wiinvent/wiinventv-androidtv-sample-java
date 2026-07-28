@@ -3,7 +3,8 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:background="@android:color/black">
+  android:background="@android:color/black"
+    xmlns:tools="http://schemas.android.com/tools">
 
   <tv.wiinvent.androidtv.ui.FriendlyPlayerView
     android:id="@+id/wisdk_exo_player_view"
@@ -24,25 +25,37 @@
     android:layout_marginEnd="20dp"
     android:layout_marginBottom="60dp"
     android:background="@drawable/skip_background_button"
-    android:nextFocusUp="@id/wisdk_report_button"
+    android:textColor="@color/skip_color_button"
     android:visibility="gone"
+    android:enabled="false"
+    android:focusable="true"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    android:textColor="@color/skip_color_button"
     android:textSize="16sp"
     android:textAllCaps="false"
-    android:text=""/>
+    android:nextFocusUp="@id/wisdk_report_button"
+      android:nextFocusDown="@id/wisdk_skip_button"
+      android:nextFocusLeft="@id/wisdk_skip_button"
+      android:nextFocusRight="@id/wisdk_skip_button"
+      />
 
-  <!-- Nút báo cáo quảng cáo (1.1.24) - SDK tự bật khi có quảng cáo -->
   <com.example.sampleandroidtv.ui.TV360ReportAdsButton
-    android:id="@+id/wisdk_report_button"
-    android:layout_width="30dp"
-    android:layout_height="30dp"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintRight_toRightOf="parent"
-    android:layout_marginEnd="10dp"
-    android:layout_marginTop="50dp"
-    android:visibility="gone"
-    android:gravity="center" />
+      android:id="@+id/wisdk_report_button"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      android:layout_marginStart="10dp"
+      android:layout_marginTop="10dp"
+      android:visibility="gone"
+      tools:visibility="visible"
+      android:focusable="true"
+      android:focusableInTouchMode="true"
+      android:nextFocusDown="@id/wisdk_skip_button"
+      android:nextFocusUp="@id/wisdk_report_button"
+      android:nextFocusLeft="@id/wisdk_report_button"
+      android:nextFocusRight="@id/wisdk_report_button"
+      android:gravity="center" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

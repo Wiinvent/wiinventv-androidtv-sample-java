@@ -1,0 +1,16 @@
+<!-- res/drawable/item_background.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Border when item is focused/moved to -->
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <stroke android:width="4dp" android:color="@android:color/white" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- Default state when not focused -->
+    <item android:state_focused="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</selector>

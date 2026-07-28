@@ -2,7 +2,6 @@ package com.example.sampleandroidtv.activity;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,33 +12,26 @@ import android.widget.ProgressBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.sampleandroidtv.fragment.ErrorFragment;
-import com.example.sampleandroidtv.fragment.MainFragment;
 import com.example.sampleandroidtv.R;
+import com.example.sampleandroidtv.fragment.ErrorFragment;
 
-/*
- * BrowseErrorActivity shows how to use ErrorFragment
+/**
+ * BrowseErrorActivity shows how to use ErrorFragment.
  */
 public class BrowseErrorActivity extends FragmentActivity {
-  private static final int TIMER_DELAY = 3000;
+
+  private static final long TIMER_DELAY = 3000L;
   private static final int SPINNER_WIDTH = 100;
   private static final int SPINNER_HEIGHT = 100;
 
   private ErrorFragment mErrorFragment;
   private SpinnerFragment mSpinnerFragment;
 
-  /**
-   * Called when the activity is first created.
-   */
   @Override
-  public void onCreate(Bundle savedInstanceState) {
+  protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    if (savedInstanceState == null) {
-      getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_browse_fragment, new MainFragment())
-          .commitNow();
-    }
+
     testError();
   }
 
@@ -56,7 +48,7 @@ public class BrowseErrorActivity extends FragmentActivity {
         .add(R.id.main_browse_fragment, mSpinnerFragment)
         .commit();
 
-    final Handler handler = new Handler(Looper.myLooper());
+    Handler handler = new Handler();
     handler.postDelayed(new Runnable() {
       @Override
       public void run() {
@@ -71,9 +63,8 @@ public class BrowseErrorActivity extends FragmentActivity {
 
   public static class SpinnerFragment extends Fragment {
     @Override
-    public View onCreateView(
-        LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-      ProgressBar progressBar = new ProgressBar(container.getContext());
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+      ProgressBar progressBar = new ProgressBar(container != null ? container.getContext() : null);
       if (container instanceof FrameLayout) {
         FrameLayout.LayoutParams layoutParams =
             new FrameLayout.LayoutParams(SPINNER_WIDTH, SPINNER_HEIGHT, Gravity.CENTER);

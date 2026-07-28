@@ -1,8 +1,8 @@
-package com.example.sampleandroidtv.presenter;
+package com.example.sampleandroidtv.Presenter;
 
 import androidx.leanback.widget.AbstractDetailsDescriptionPresenter;
 
-import com.example.sampleandroidtv.pojo.Movie;
+import com.example.sampleandroidtv.model.Movie;
 
 public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPresenter {
 
@@ -10,10 +10,8 @@ public class DetailsDescriptionPresenter extends AbstractDetailsDescriptionPrese
   protected void onBindDescription(ViewHolder viewHolder, Object item) {
     Movie movie = (Movie) item;
 
-    if (movie != null) {
-      viewHolder.getTitle().setText(movie.getTitle());
-      viewHolder.getSubtitle().setText(movie.getStudio());
-      viewHolder.getBody().setText(movie.getDescription());
-    }
+    viewHolder.getTitle().setText(movie.getTitle());
+    viewHolder.getSubtitle().setText(movie.getStudio());
+    viewHolder.getBody().setText(movie.getDescription());
   }
 }

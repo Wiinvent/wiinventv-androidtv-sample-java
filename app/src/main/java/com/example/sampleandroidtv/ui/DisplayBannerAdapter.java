@@ -1,21 +1,19 @@
 package com.example.sampleandroidtv.ui;
 
-
 import android.app.Activity;
-import android.os.Build;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams;
 import androidx.core.util.Pair;
-import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sampleandroidtv.R;
+import com.example.sampleandroidtv.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,37 +25,27 @@ import tv.wiinvent.androidtv.models.type.BannerDisplayType;
 import tv.wiinvent.androidtv.ui.banner.BannerAdView;
 
 public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdapter.DisplayBannerViewHolder> {
-    ArrayList<Pair<String, BannerDisplayAdSize>> bannerParams = new ArrayList();
-    private String channelIdDefault = "998989";
-    private String streamIdDefault = "999999";
 
-    private Activity activity;
+    private final Activity activity;
+    private final String streamIdDefault;
+    private final String channelIdDefault;
 
-    public DisplayBannerAdapter(Activity activity, ArrayList<Pair<String, BannerDisplayAdSize>>  bannerParams) {
-        super();
+    private List<Pair<String, BannerDisplayAdSize>> bannerParams = new ArrayList<>();
+
+    public DisplayBannerAdapter(Activity activity, String streamIdDefault, String channelIdDefault) {
         this.activity = activity;
-        this.bannerParams = bannerParams;
+        this.streamIdDefault = streamIdDefault;
+        this.channelIdDefault = channelIdDefault;
     }
 
-    public void setBannerParams(ArrayList<Pair<String, BannerDisplayAdSize>> bannerParams) {
+    public void setBannerParams(List<Pair<String, BannerDisplayAdSize>> bannerParams) {
         this.bannerParams = bannerParams;
     }
 
     @Override
-    public DisplayBannerViewHolder onCreateViewHolder(ViewGroup parent , int viewType)  {
-
+    public DisplayBannerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new DisplayBannerViewHolder(
-                LayoutInflater.from(parent.getContext()).inflate(
-                        R.layout.display_banner_item, parent, false
-                )
-        );
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull DisplayBannerViewHolder holder, int position) {
-        Pair<String, BannerDisplayAdSize> item = bannerParams.get(position);
-        holder.bind(item);
-
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.display_banner_item, parent, false));
     }
 
     @Override
@@ -65,114 +53,100 @@ public class DisplayBannerAdapter extends RecyclerView.Adapter<DisplayBannerAdap
         return bannerParams.size();
     }
 
-    private Pair<String, BannerDisplayAdSize> item(int position) {
-        if (position < 0 || position >= bannerParams.size()) {
-            return null;
-        } else {
-            return bannerParams.get(position);
-        }
-    }
-
     @Override
-    public void onViewRecycled(@NonNull DisplayBannerViewHolder holder) {
-        super.onViewRecycled(holder);
-        holder.recycled();
+    public void onBindViewHolder(DisplayBannerViewHolder holder, int position) {
+        holder.bind(bannerParams.get(position));
     }
 
     class DisplayBannerViewHolder extends RecyclerView.ViewHolder {
-        private ConstraintLayout ctlBanner;
-        private TextView tvTitle;
-        private BannerAdView bannerAdView;
-        private TV360ReportAdsButton reportButton;
 
-        public DisplayBannerViewHolder(View itemView) {
+        private final ConstraintLayout ctlBanner;
+        private final TextView tvTitle;
+        private final BannerAdView bannerAdView;
+        private final TV360ReportAdsButton reportButton;
+        private final TV360InfoAdsButton infoAdsBtn;
+
+        DisplayBannerViewHolder(View itemView) {
             super(itemView);
 
             ctlBanner = itemView.findViewById(R.id.ctlBanner);
             tvTitle = itemView.findViewById(R.id.tvTitle);
+
             bannerAdView = new BannerAdView(itemView.getContext());
-            bannerAdView.setId(generateViewId());
-            ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(0, 100);
+            bannerAdView.setId(View.generateViewId());
+            // Use foreground instead of background so the border is drawn ON TOP of the ad content
+            bannerAdView.setForeground(AppCompatResources.getDrawable(itemView.getContext(), R.drawable.bg_banner_display_ad_view));
+
+            LayoutParams layoutParams = new LayoutParams(0, LayoutParams.WRAP_CONTENT);
             layoutParams.topToBottom = tvTitle.getId();
-            layoutParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams.startToStart = LayoutParams.PARENT_ID;
+            layoutParams.endToEnd = LayoutParams.PARENT_ID;
             layoutParams.topMargin = 20;
-            layoutParams.rightMargin = 2;
-            layoutParams.leftMargin = 2;
-            layoutParams.bottomMargin = 2;
+
+            // Allow the banner to follow the focus state of the parent item (ctlBanner)
+            bannerAdView.setDuplicateParentStateEnabled(true);
+            bannerAdView.setFocusable(false); // Let ctlBanner handle the actual focus
+
             bannerAdView.setLayoutParams(layoutParams);
             ctlBanner.addView(bannerAdView);
 
-            // nút báo cáo (1.1.24) - tạo per-row, neo góc trên-phải của banner; SDK tự show/hide
             reportButton = new TV360ReportAdsButton(itemView.getContext());
-            reportButton.setId(generateViewId());
-            ConstraintLayout.LayoutParams reportParams = new ConstraintLayout.LayoutParams(60, 60);
-            reportParams.topToTop = bannerAdView.getId();
-            reportParams.endToEnd = bannerAdView.getId();
-            reportParams.rightMargin = 10;
-            reportParams.topMargin = 10;
-            reportButton.setLayoutParams(reportParams);
+            reportButton.setId(View.generateViewId());
+            // Configure D-pad navigation: Right from ctlBanner goes to reportButton
+            ctlBanner.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+            ctlBanner.setNextFocusRightId(reportButton.getId());
+            reportButton.setNextFocusLeftId(ctlBanner.getId());
+
+            LayoutParams layoutParamsReportButton = new LayoutParams(0, 0);
+            layoutParamsReportButton.topToTop = bannerAdView.getId();
+            layoutParamsReportButton.bottomToBottom = bannerAdView.getId();
+            layoutParamsReportButton.endToEnd = bannerAdView.getId();
+            layoutParamsReportButton.matchConstraintPercentHeight = 0.2f;
+            layoutParamsReportButton.verticalBias = 0f;
+            layoutParamsReportButton.dimensionRatio = "h,1:1";
+            layoutParamsReportButton.topMargin = 20;
+            layoutParamsReportButton.setMarginEnd(20);
+            reportButton.setLayoutParams(layoutParamsReportButton);
             reportButton.setVisibility(View.GONE);
             ctlBanner.addView(reportButton);
+
+            infoAdsBtn = new TV360InfoAdsButton(itemView.getContext());
+            infoAdsBtn.setId(View.generateViewId());
+            LayoutParams layoutParamsInfoAdsButton = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            layoutParamsInfoAdsButton.topToTop = bannerAdView.getId();
+            layoutParamsInfoAdsButton.startToStart = bannerAdView.getId();
+            infoAdsBtn.setTextSize(18f);
+            infoAdsBtn.setLayoutParams(layoutParamsInfoAdsButton);
+            infoAdsBtn.setVisibility(View.GONE);
+            ctlBanner.addView(infoAdsBtn);
         }
 
-        void recycled() {
-            if(bannerAdView != null) {
-                DisplayBannerManager.Companion.getInstance().releaseBanner(bannerAdView);
-            }
+        void bind(Pair<String, BannerDisplayAdSize> params) {
+            tvTitle.setText("Banner " + params.first);
+            showDisplayBanner(params.second, BannerDisplayType.DISPLAY, bannerAdView.getId(), params.first);
         }
 
-        void bind(Pair<String, BannerDisplayAdSize> params ) {
-            tvTitle.setText(String.format("Banner %s", params.first));
-            showDisplayBanner(
-                    params.second,
-                    BannerDisplayType.DISPLAY,
-                    bannerAdView.getId(),
-                    params.first
-            );
-        }
-
-        void showDisplayBanner(
-                BannerDisplayAdSize adSize,
-                BannerDisplayType displayType,
-                int viewId,
-                String positionId
-        ) {
+        void showDisplayBanner(BannerDisplayAdSize adSize, BannerDisplayType displayType, int viewId, String positionId) {
+            if (activity == null) return;
             DisplayBannerAdsRequestData bannerAdsRequestData =
                     new DisplayBannerAdsRequestData.Builder()
-                            .channelId(channelIdDefault.isEmpty() ? "998989" : channelIdDefault)
-                            .streamId(streamIdDefault.isEmpty() ? "999999" : streamIdDefault)
                             .adSize(adSize)
                             .bannerDisplayType(displayType)
-                            .title("Day la title")
-                            .category("category 1, category 2")
-                            .transId("1112222222")
-                            // .age(30)
-                            // .gender(Gender.FEMALE)
-                            .uid("123123123")
-                            .userImpressionLimit(5) // giới hạn số lần hiển thị / người dùng (0 = không giới hạn)
-                            .color("#ffffff00")
-                            .segments("a3,34,d3,d3")
+                            .channelId(channelIdDefault.trim().isEmpty() ? Constants.CHANNEL_ID_DEFAULT : channelIdDefault)
+                            .streamId(streamIdDefault.trim().isEmpty() ? Constants.STREAM_ID_DEFAULT : streamIdDefault)
+                            .title(Constants.TITLE_DEFAULT)
+                            .category(Constants.CATEGORY_ID_DEFAULT)
+                            .transId(Constants.TRANS_ID_DEFAULT)
+                            .userId(Constants.USER_ID_DEFAULT)
+                            .userImpressionLimit(Constants.USER_IMPRESSION_LIMIT_DEFAULT)
+                            .color(Constants.COLOR_BANNER_DEFAULT)
+                            .segments(Constants.SEGMENT_DEFAULT)
                             .positionId(positionId)
+                            .adPendingTime(20)
                             .build();
 
-
             DisplayBannerManager.Companion.getInstance().requestAds(
-                    activity,
-                    bannerAdView,
-                    reportButton, // nút báo cáo quảng cáo (1.1.24)
-                    bannerAdsRequestData
-            );
-
-
-
+                    activity, bannerAdView, reportButton, infoAdsBtn, bannerAdsRequestData);
         }
-
-        private int generateViewId() {
-            return View.generateViewId();
-        }
-
-
     }
 }

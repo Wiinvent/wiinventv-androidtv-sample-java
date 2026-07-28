@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="TimerButton">
+    <attr name="animationCompleteText" format="string|reference"/>
+    <attr name="defaultText" format="string|reference"/>
+    <attr name="dynamicString" format="reference"/>
+    <attr name="animationBackground" format="reference"/>
+    <attr name="buttonBackground" format="reference"/>
+    <attr name="buttonTextColor" format="reference|color"/>
+    <attr name="buttonTextSize" format="reference|dimension"/>
+    <attr name="buttonTextFont" format="reference"/>
+  </declare-styleable>
+  <declare-styleable name="TV360InfoAdsButton">
+    <!-- Sử dụng lại thuộc tính textSize của hệ thống Android -->
+    <attr name="android:textSize" />
+  </declare-styleable>
+</resources>

@@ -5,8 +5,9 @@
   android:layout_height="match_parent"
   tools:context=".activity.MainActivity">
 
-  <FrameLayout
+  <fragment
     android:id="@+id/main_browse_fragment"
+    android:name="com.example.sampleandroidtv.fragment.MainFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.MainActivity"
@@ -19,5 +20,4 @@
     android:layout_height="match_parent"
     android:visibility="gone"
     />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,280 +1,45 @@
 package com.example.sampleandroidtv.activity;
 
-import android.annotation.SuppressLint;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.view.KeyEvent;
+import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.example.sampleandroidtv.R;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSource;
-import com.google.android.exoplayer2.util.Util;
+import com.example.sampleandroidtv.fragment.DisplayBannerFragment;
+import com.example.sampleandroidtv.fragment.OverlayBannerFragment;
 
-import java.util.Objects;
-
-import tv.wiinvent.androidtv.OverlayBannerManager;
-import tv.wiinvent.androidtv.interfaces.banner.BannerAdEventListener;
-import tv.wiinvent.androidtv.models.ads.DisplayBannerAdsRequestData;
 import tv.wiinvent.androidtv.models.type.BannerDisplayAdSize;
-import tv.wiinvent.androidtv.models.type.BannerDisplayType;
-import tv.wiinvent.androidtv.models.type.Environment;
-import tv.wiinvent.androidtv.report.ReportButtonAds;
-import tv.wiinvent.androidtv.ui.banner.BannerAdView;
 
-public class OverlayBannerActivity extends FragmentActivity {
-    public static final String TAG = OverlayBannerActivity.class.getCanonicalName();
+public class OverlayBannerActivity extends FragmentActivity implements OnItemSelectedListener {
 
-    private PlayerView playerView = null;
-    private ExoPlayer player = null;
-    private ReportButtonAds reportButton = null;
-
-    private String channelIdDefault = "998989";
-    private String streamIdDefault = "999999";
-    private String positionIdDefault = "homepage1";
-    private BannerDisplayAdSize adSize = BannerDisplayAdSize.HOMEPAGE_BANNER;
-
-    private static final String CONTENT_URL = "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8";
-
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_overlays_banner);
-        playerView = findViewById(R.id.player_view);
-        reportButton = findViewById(R.id.overlay_report_button);
-
-//        Objects.requireNonNull(getSupportActionBar()).hide();
-
-        Button overlayBannerButton = findViewById(R.id.overlay_banner);
-        overlayBannerButton.setOnClickListener(v -> loadPlayer());
-
-        initOverlayBannerManager();
-        initializePlayer();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, new OverlayBannerFragment())
+                    .commit();
+        }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
-        OverlayBannerManager.Companion.getInstance().release();
-
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        Toast.makeText(this, "keycode:  " + keyCode, Toast.LENGTH_LONG).show();
+        return super.onKeyUp(keyCode, event);
     }
 
-    private void initOverlayBannerManager() {
-
-        OverlayBannerManager.Companion.getInstance().init(
-                this,
-                "14",
-                Environment.SANDBOX,
-                10,
-                true
-        );
-
-        OverlayBannerManager.Companion.getInstance().addBannerListener(new BannerAdEventListener() {
-            @Override
-            public void onDisplayAds(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========OverlayBannerManager onDisplayAds");
-
-                runOnUiThread(() -> {
-                    if (adView != null) {
-                        adView.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-
-            @Override
-            public void onNoAds(String positionId, BannerAdView adView) {
-                Log.d(TAG, "=========OverlayBannerManager khong co ads de show 1");
-            }
-
-            @Override
-            public void onAdsBannerDismiss(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========OverlayBannerManager onAdsBannerDismiss");
-
-                runOnUiThread(() -> {
-                    if (adView != null) {
-                        adView.setVisibility(View.GONE);
-                        OverlayBannerManager.Companion.getInstance().releaseBanner(adView, reportButton);
-                    }
-                });
-            }
-
-            @Override
-            public void onAdsBannerError(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========OverlayBannerManager onAdsWelcomeError");
-
-                runOnUiThread(() -> {
-                    if (adView != null) {
-                        adView.setVisibility(View.GONE);
-                        OverlayBannerManager.Companion.getInstance().releaseBanner(adView, reportButton);
-                    }
-                });
-            }
-
-            @Override
-            public void onAdsBannerClick(String positionId, String clickThroughLink) {
-                Log.d(TAG, "=========OverlayBannerManager onAdsBannerClick " + clickThroughLink);
-            }
-
-            @Override
-            public void onShowReportButton(String positionId, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========OverlayBannerManager onShowReportButton");
-                runOnUiThread(() -> {
-                    if (reportButton != null) {
-                        reportButton.show(OverlayBannerActivity.this);
-                    }
-                });
-            }
-
-            @Override
-            public void onHideReportButton(String positionId, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========OverlayBannerManager onHideReportButton");
-                runOnUiThread(() -> {
-                    if (reportButton != null) {
-                        reportButton.hide();
-                    }
-                });
-            }
-        });
+    @Override
+    public void onDisplayBannerParams() {
     }
 
-    private void initializePlayer() {
-        player = new ExoPlayer.Builder(getBaseContext()).build();
-        playerView.setPlayer(player);
-        playerView.setUseController(true);
-
-        player.addListener(new Player.Listener() {
-
-            @Override
-            public void onPlaybackStateChanged(int playbackState) {
-                if (playbackState == Player.STATE_READY && !player.getPlayWhenReady()) {
-                    Log.e(TAG, "ExoPlayer is paused");
-                    showOverlayBanner();
-                } else if (playbackState == Player.STATE_READY && player.getPlayWhenReady()) {
-                    dismissOverlayBanner();
-                }
-            }
-
-            @Override
-            public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
-                if (!playWhenReady && player.getPlaybackState() == Player.STATE_READY) {
-                    Log.d(TAG, "ExoPlayer is paused");
-                    showOverlayBanner();
-                } else if (player.getPlaybackState() == Player.STATE_READY && playWhenReady) {
-                    dismissOverlayBanner();
-                }
-            }
-        });
-
-        // loadPlayer();
-    }
-
-    public void showOverlayBanner() {
-        showDisplayBanner(
-                BannerDisplayAdSize.PAUSE_BANNER,
-                BannerDisplayType.OVERLAY,
-                R.id.banner_ad_overlay_view,
-                ""
-        );
-    }
-
-    public void dismissOverlayBanner() {
-        BannerAdView bannerView = findViewById(R.id.banner_ad_overlay_view);
-        OverlayBannerManager.Companion.getInstance().releaseBanner(bannerView, reportButton);
-    }
-
-    public void showDisplayBanner(
-            BannerDisplayAdSize adSize,
-            BannerDisplayType displayType,
-            int viewId,
-            String positionId
-    ) {
-        DisplayBannerAdsRequestData bannerAdsRequestData =
-                new DisplayBannerAdsRequestData.Builder()
-                        .channelId(channelIdDefault.isEmpty() ? "998989" : channelIdDefault)
-                        .streamId(streamIdDefault.isEmpty() ? "999999" : streamIdDefault)
-                        .adSize(adSize)
-                        .bannerDisplayType(displayType)
-                        .title("Day la title")
-                        .category("category 1, category 2")
-                        .transId("1112222222")
-                        // .age(30)
-                        // .gender(Gender.FEMALE)
-                        .uid("123123123")
-                        .userImpressionLimit(5) // giới hạn số lần hiển thị / người dùng (0 = không giới hạn)
-                        .color("#ffffff00")
-                        .segments("a3,34,d3,d3")
-                        .positionId(positionId)
-                        .build();
-
-        BannerAdView bannerAdView = findViewById(R.id.banner_ad_overlay_view);
-        OverlayBannerManager.Companion.getInstance().requestAds(
-                this,
-                bannerAdView,
-                bannerAdsRequestData,
-                30, // cacheTimeSec: thời gian cache dữ liệu quảng cáo (giây)
-                reportButton // nút báo cáo quảng cáo (1.1.24)
-        );
-    }
-
-
-    private void loadPlayer() {
-        DataSource.Factory dataSourceFactory = new DefaultDataSource.Factory(getBaseContext());
-        MediaSource mediaSource = buildMediaSource(dataSourceFactory, CONTENT_URL);
-
-        player.setMediaSource(mediaSource);
-        player.prepare();
-        player.setPlayWhenReady(true);
-    }
-
-    private MediaSource buildMediaSource(DataSource.Factory dataSourceFactory, String url) {
-        Uri uri = Uri.parse(url);
-        int type = Util.inferContentType(uri);
-
-        switch (type) {
-            case C.TYPE_DASH:
-                return new DashMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(MediaItem.fromUri(uri));
-
-            case C.TYPE_HLS:
-                return new HlsMediaSource.Factory(dataSourceFactory)
-                        .setAllowChunklessPreparation(true)
-                        .createMediaSource(MediaItem.fromUri(uri));
-
-            case C.TYPE_SS:
-                return new SsMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(MediaItem.fromUri(uri));
-
-            case C.TYPE_OTHER:
-                return new ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(MediaItem.fromUri(uri));
-
-            default:
-                throw new IllegalStateException("Unsupported type: " + type);
-        }
-    }
-
-
-    private void releasePlayer() {
-        if (player != null) {
-            player.stop();
-            player.release();
-            player = null;
-        }
+    @Override
+    public void onDisplayBanner(String streamId, String channelId, String positionId, BannerDisplayAdSize adSize) {
+        DisplayBannerFragment newFragment = new DisplayBannerFragment(streamId, channelId, positionId, adSize);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(android.R.id.content, newFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:id="@+id/tvStreamIdLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Stream id"
+
+        />
+    <EditText
+        android:id="@+id/edtStreamIdValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvStreamIdLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+
+        />
+    <TextView
+        android:id="@+id/tvChannelIdLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/edtStreamIdValue"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Channel id"
+        android:layout_marginTop="20dp"
+
+        />
+    <EditText
+        android:id="@+id/edtChannelIdValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvChannelIdLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+
+        />
+
+    <TextView
+        android:id="@+id/tvPositionIdLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/edtChannelIdValue"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Position id"
+        android:layout_marginTop="20dp"
+
+        />
+    <EditText
+        android:id="@+id/edtPositionIdValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvPositionIdLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+
+        />
+    <TextView
+        android:id="@+id/tvBannerSizeLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/edtPositionIdValue"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="Banner Size"
+        android:layout_marginTop="20dp"
+
+        />
+
+    <Spinner
+        android:id="@+id/edtBannerSizeValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvBannerSizeLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/edtBannerSizeValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

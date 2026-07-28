@@ -1,29 +1,25 @@
 package com.example.sampleandroidtv.ui;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.example.sampleandroidtv.R;
 
 import tv.wiinvent.androidtv.ui.instream.SkipAdsButtonAds;
 
 public class TV360SkipAdsButtonAds extends SkipAdsButtonAds {
-  public TV360SkipAdsButtonAds(@Nullable Context context) {
+
+  public TV360SkipAdsButtonAds(Context context) {
     super(context);
     init();
   }
 
-  public TV360SkipAdsButtonAds(@NonNull Context context, @NonNull AttributeSet attrs) {
+  public TV360SkipAdsButtonAds(Context context, AttributeSet attrs) {
     super(context, attrs);
     init();
   }
 
-  public TV360SkipAdsButtonAds(@NonNull Context context, @NonNull AttributeSet attrs, int defStyleAttr) {
+  public TV360SkipAdsButtonAds(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     init();
   }
@@ -31,10 +27,10 @@ public class TV360SkipAdsButtonAds extends SkipAdsButtonAds {
   @Override
   public void init() {
     inflate(getContext(), R.layout.layout_skip_button, this);
-    this.setSkipButton(findViewById(R.id.skip_ads_button));
+    setSkipButton(findViewById(R.id.skip_ads_button));
     setSkipLabel("Bỏ qua quảng cáo");
-   setCountdownLabel("Bỏ qua sau");
-   setUnitLabel("giây");
-    setIconDrawable( R.drawable.skip_icon_button);
+    setCountdownLabel("Bỏ qua sau");
+    setUnitLabel("giây");
+    setIconDrawable(R.drawable.skip_icon_button);
   }
 }

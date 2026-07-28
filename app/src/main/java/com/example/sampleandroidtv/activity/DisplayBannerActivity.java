@@ -1,222 +1,45 @@
 package com.example.sampleandroidtv.activity;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.view.KeyEvent;
+import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.util.Pair;
 import androidx.fragment.app.FragmentActivity;
-import androidx.leanback.widget.VerticalGridView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.example.sampleandroidtv.R;
-import com.example.sampleandroidtv.ui.DisplayBannerAdapter;
+import com.example.sampleandroidtv.fragment.DisplayBannerFragment;
+import com.example.sampleandroidtv.fragment.DisplayBannerMultipleFragment;
 
-import java.util.ArrayList;
-import java.util.Objects;
-
-import tv.wiinvent.androidtv.DisplayBannerManager;
-import tv.wiinvent.androidtv.interfaces.banner.BannerAdEventListener;
-import tv.wiinvent.androidtv.models.ads.DisplayBannerAdsRequestData;
 import tv.wiinvent.androidtv.models.type.BannerDisplayAdSize;
-import tv.wiinvent.androidtv.models.type.BannerDisplayType;
-import tv.wiinvent.androidtv.models.type.Environment;
-import tv.wiinvent.androidtv.report.ReportButtonAds;
-import tv.wiinvent.androidtv.ui.banner.BannerAdView;
 
-public class DisplayBannerActivity extends FragmentActivity {
-    public static final String TAG = FragmentActivity.class.getCanonicalName();
+public class DisplayBannerActivity extends FragmentActivity implements OnItemSelectedListener {
 
-    private String channelIdDefault = "998989";
-    private String streamIdDefault = "999999";
-    private String positionIdDefault = "homepage1";
-    private BannerDisplayAdSize adSize = BannerDisplayAdSize.HOMEPAGE_BANNER;
-
-    private static final String CONTENT_URL = "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8";
-
-
-    private ArrayList<Pair<String, BannerDisplayAdSize>> bannerParams = new ArrayList<>();
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_banner);
-
-
-//        Button displayBannerButton = findViewById(R.id.display_banner);
-//        displayBannerButton.setOnClickListener(v -> showDisplayBanner());
-
-//        Button overlayBannerButton = findViewById(R.id.overlay_banner);
-
-        initBannerList();
-        initDisplayBannerManager();
-        DisplayBannerAdapter displayBannerAdapter = new DisplayBannerAdapter(this, bannerParams);
-        VerticalGridView rvBanner = findViewById(R.id.rvBanner);
-        rvBanner.setAdapter(displayBannerAdapter);
-        rvBanner.setLayoutManager(new LinearLayoutManager(this,
-                RecyclerView.VERTICAL,
-                false));
-
-        Button refreshButton = findViewById(R.id.refresh);
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                refreshButton.setEnabled(false);
-                DisplayBannerManager.Companion.getInstance().refreshBannerData();
-                displayBannerAdapter.setBannerParams(new ArrayList<>());
-                displayBannerAdapter.notifyDataSetChanged();
-
-                displayBannerAdapter.setBannerParams(bannerParams);
-                displayBannerAdapter.notifyDataSetChanged();
-                refreshButton.setEnabled(true);
-
-            }
-        });
-
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, new DisplayBannerMultipleFragment())
+                    .commit();
+        }
     }
 
-    public void initBannerList() {
-        bannerParams.add(new Pair("HOME_0", BannerDisplayAdSize.HOMEPAGE_BANNER));
-        bannerParams.add(new Pair("subpage1", BannerDisplayAdSize.SUBPAGE_BANNER));
-        bannerParams.add(new Pair("HOME_1", BannerDisplayAdSize.HOMEPAGE_BANNER));
-        bannerParams.add(new Pair("subpage2", BannerDisplayAdSize.SUBPAGE_BANNER));
-        bannerParams.add(new Pair("HOME_2", BannerDisplayAdSize.HOMEPAGE_BANNER));
-        bannerParams.add(new Pair("subpage3", BannerDisplayAdSize.SUBPAGE_BANNER));
-        bannerParams.add(new Pair("HOME_3", BannerDisplayAdSize.HOMEPAGE_BANNER));
-        bannerParams.add(new Pair("subpage4", BannerDisplayAdSize.SUBPAGE_BANNER));
-        bannerParams.add(new Pair("HOME_4", BannerDisplayAdSize.HOMEPAGE_BANNER));
-        bannerParams.add(new Pair("subpage5", BannerDisplayAdSize.SUBPAGE_BANNER));
-        bannerParams.add(new Pair("homepage6", BannerDisplayAdSize.HOMEPAGE_BANNER));
-        bannerParams.add(new Pair("subpage6", BannerDisplayAdSize.SUBPAGE_BANNER));
-        bannerParams.add(new Pair("homepage7", BannerDisplayAdSize.HOMEPAGE_BANNER));
-        bannerParams.add(new Pair("subpage7", BannerDisplayAdSize.SUBPAGE_BANNER));
-    }
-    private void initDisplayBannerManager() {
-
-        DisplayBannerManager.Companion.getInstance().init(
-                this,
-                "14",
-                Environment.SANDBOX,
-                10,
-                true
-        );
-
-        DisplayBannerManager.Companion.getInstance().addBannerListener(new BannerAdEventListener() {
-            @Override
-            public void onDisplayAds(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========DisplayBannerManager onDisplayAds");
-
-                runOnUiThread(() -> {
-                    if (adView != null) {
-                        adView.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-
-            @Override
-            public void onNoAds(String positionId, BannerAdView adView) {
-                Log.d(TAG, "=========DisplayBannerManager khong co ads de show: " + positionId);
-            }
-
-            @Override
-            public void onAdsBannerDismiss(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========DisplayBannerManager onAdsBannerDismiss");
-
-                runOnUiThread(() -> {
-                    if (adView != null) {
-                        adView.setVisibility(View.GONE);
-                        DisplayBannerManager.Companion.getInstance().releaseBanner(adView);
-                    }
-                });
-            }
-
-            @Override
-            public void onAdsBannerError(String positionId, BannerAdView adView, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========DisplayBannerManager onAdsWelcomeError");
-
-                runOnUiThread(() -> {
-                    if (adView != null) {
-                        adView.setVisibility(View.GONE);
-                        DisplayBannerManager.Companion.getInstance().releaseBanner(adView);
-                    }
-                });
-            }
-
-            @Override
-            public void onAdsBannerClick(String positionId, String clickThroughLink) {
-                Log.d(TAG, "=========DisplayBannerManager onAdsBannerClick " + clickThroughLink);
-            }
-
-            @Override
-            public void onShowReportButton(String positionId, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========DisplayBannerManager onShowReportButton");
-                runOnUiThread(() -> {
-                    if (reportButton != null) {
-                        reportButton.show(DisplayBannerActivity.this);
-                    }
-                });
-            }
-
-            @Override
-            public void onHideReportButton(String positionId, ReportButtonAds reportButton) {
-                Log.d(TAG, "=========DisplayBannerManager onHideReportButton");
-                runOnUiThread(() -> {
-                    if (reportButton != null) {
-                        reportButton.hide();
-                    }
-                });
-            }
-        });
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        Toast.makeText(this, "keycode:  " + keyCode, Toast.LENGTH_LONG).show();
+        return super.onKeyUp(keyCode, event);
     }
 
-
-    public void showDisplayBanner() {
-//        showDisplayBanner(
-//                adSize,
-//                BannerDisplayType.DISPLAY,
-//                R.id.banner_ad_display_view,
-//                positionIdDefault.isEmpty() ? "homepage1" : positionIdDefault
-//        );
+    @Override
+    public void onDisplayBannerParams() {
     }
 
-    public void showDisplayBanner(
-            BannerDisplayAdSize adSize,
-            BannerDisplayType displayType,
-            int viewId,
-            String positionId
-    ) {
-        DisplayBannerAdsRequestData bannerAdsRequestData =
-                new DisplayBannerAdsRequestData.Builder()
-                        .channelId(channelIdDefault.isEmpty() ? "998989" : channelIdDefault)
-                        .streamId(streamIdDefault.isEmpty() ? "999999" : streamIdDefault)
-                        .adSize(adSize)
-                        .bannerDisplayType(displayType)
-                        .title("Day la title")
-                        .category("category 1, category 2")
-                        .transId("1112222222")
-                        // .age(30)
-                        // .gender(Gender.FEMALE)
-                        .uid("123123123")
-                        .userImpressionLimit(5) // giới hạn số lần hiển thị / người dùng (0 = không giới hạn)
-                        .color("#ffffff00")
-                        .segments("a3,34,d3,d3")
-                        .positionId(positionId)
-                        .build();
-
-        BannerAdView bannerAdView = findViewById(viewId);
-        DisplayBannerManager.Companion.getInstance().requestAds(
-                this,
-                bannerAdView,
-                null, // nút báo cáo (tạo per-row trong DisplayBannerAdapter)
-                bannerAdsRequestData
-        );
+    @Override
+    public void onDisplayBanner(String streamId, String channelId, String positionId, BannerDisplayAdSize adSize) {
+        DisplayBannerFragment newFragment = new DisplayBannerFragment(streamId, channelId, positionId, adSize);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(android.R.id.content, newFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
-
-
-
 }

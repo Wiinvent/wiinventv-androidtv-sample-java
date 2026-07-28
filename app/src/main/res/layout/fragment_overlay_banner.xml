@@ -34,18 +34,84 @@
 
 
         </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
-        <tv.wiinvent.androidtv.ui.banner.BannerAdView
-            android:id="@+id/banner_ad_overlay_view"
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/banner_overlay_wrapper"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:visibility="visible"
             android:layout_marginBottom="20dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:descendantFocusability="beforeDescendants"
+            android:nextFocusRight="@id/overlay_banner_report_button"
             app:layout_constraintBottom_toBottomOf="@id/video_frame"
             app:layout_constraintStart_toStartOf="@id/video_frame"
             app:layout_constraintEnd_toEndOf="@id/video_frame"
             app:layout_constraintWidth_percent="0.5"
-            android:layout_marginHorizontal="20dp"
-            />
+            android:layout_marginHorizontal="20dp">
+
+            <tv.wiinvent.androidtv.ui.banner.BannerAdView
+                android:id="@+id/banner_ad_overlay_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:layout_height="100dp"
+                android:visibility="visible"
+                android:duplicateParentState="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+            <com.example.sampleandroidtv.ui.TV360ReportAdsButton
+                android:id="@+id/overlay_banner_report_button"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:focusable="true"
+                android:nextFocusLeft="@id/banner_overlay_wrapper"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHeight_percent="0.2"
+                app:layout_constraintDimensionRatio="h,1:1"
+                app:layout_constraintVertical_bias="0"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="3dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:text=" ! "
+                android:background="#D7323232"
+                android:gravity="center"/>
+
+            <com.example.sampleandroidtv.ui.TV360InfoAdsButton
+                android:id="@+id/overlay_banner_info_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:textColor="@color/white"
+                android:textSize="5sp"
+                android:textAllCaps="false"
+                android:text=" ! "
+                android:background="#D7323232"
+                android:gravity="center"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <com.google.android.exoplayer2.ui.PlayerControlView
+            android:id="@+id/playerControlView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/video_frame"
+            app:show_timeout="0" />
+
+
 
         <Button
             android:id="@+id/overlay_banner"
@@ -53,7 +119,7 @@
             android:layout_height="wrap_content"
             android:text="Load Player With Overlay"
             android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@id/video_frame"
+            app:layout_constraintTop_toBottomOf="@id/playerControlView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="20dp"
