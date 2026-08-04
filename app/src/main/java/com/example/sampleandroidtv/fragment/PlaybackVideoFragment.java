@@ -72,6 +72,7 @@ public class PlaybackVideoFragment extends Fragment {
   private TV360SkipAdsButtonAds skipButton = null;
   private TV360ReportAdsButton reportButton = null;
   private boolean isInStreamAdPlaying = false;
+  private boolean isSkipButtonReady = false; // 1.1.26: nút skip đã bấm được (hết đếm ngược) hay chưa
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -111,11 +112,15 @@ public class PlaybackVideoFragment extends Fragment {
           return true;
         }
         return false;
-      // Từ nút report -> trả focus về nút skip của IMA
+      // Từ nút report -> trả focus về nút skip
       case KeyEvent.KEYCODE_DPAD_DOWN:
       case KeyEvent.KEYCODE_DPAD_RIGHT:
         if (reportButton.hasFocus()) {
-          InStreamManager.Companion.getInstance().focusSkipButton();
+          if (isSkipButtonReady && skipButton != null) {
+            skipButton.requestFocusToSkip();          // skip custom đã bấm được
+          } else {
+            InStreamManager.Companion.getInstance().focusSkipButton(); // IMA / đang đếm ngược
+          }
           return true;
         }
         return false;
@@ -136,6 +141,18 @@ public class PlaybackVideoFragment extends Fragment {
     super.onResume();
     if (skipButton != null) skipButton.resume();
     if (exoPlayer != null) exoPlayer.setPlayWhenReady(true);
+  }
+
+  // 1.1.26: BẮT BUỘC release player để nhả hardware video decoder, tránh đứng hình
+  // quảng cáo InStream ở lần phát sau trên một số TV box (Amlogic...).
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    InStreamManager.Companion.getInstance().release();
+    if (exoPlayer != null) {
+      exoPlayer.release();
+      exoPlayer = null;
+    }
   }
 
   protected void init(Bundle savedInstanceState) {
@@ -165,11 +182,13 @@ public class PlaybackVideoFragment extends Fragment {
 
       @Override
       public void showSkipButton(@NonNull String campaignId, int duration) {
+        isSkipButtonReady = false; // bắt đầu đếm ngược -> skip chưa bấm được (1.1.26)
         if (skipButton != null) {
           skipButton.startCountdown(duration, new SkipAdsButtonAds.WiSkipButtonListener() {
             @Override
             public void onRequestFocus() {
               Log.d(TAG, "=====on request forcus");
+              isSkipButtonReady = true; // đếm ngược xong -> đã bấm được
               if (skipButton != null) skipButton.requestFocusToSkip();
             }
           });
@@ -178,6 +197,7 @@ public class PlaybackVideoFragment extends Fragment {
 
       @Override
       public void hideSkipButton(@NonNull String campaignId) {
+        isSkipButtonReady = false;
         if (skipButton != null) skipButton.hide();
       }
 
