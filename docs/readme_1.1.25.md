@@ -18,15 +18,11 @@ implementation 'com.google.android.exoplayer:extension-ima:2.19.1'
 | # | Thay đổi | Loại | Ảnh hưởng tích hợp |
 |---|---|---|---|
 | 1 | Đổi builder `uid` / `uid20` → **`userId`** | ⚠️ Breaking | Phải đổi `.uid(...)`/`.uid20(...)` → `.userId(...)` |
-| 2 | `BannerAdEventListener` thêm tham số **`infoButton`** trong các callback | ⚠️ Breaking | Cập nhật lại chữ ký các hàm override |
-| 3 | Nút report **không còn tự động focus** khi hiện | ⚠️ Đổi hành vi | Tự gọi focus nếu vẫn muốn focus |
-| 4 | Thêm **Info Button** (thẻ đánh dấu quảng cáo) | Tính năng mới | Tuỳ chọn (`infoButtonId`, mặc định tắt) |
+| 2 | `BannerAdEventListener` thêm tham số **`infoButton`** trong các callback | ⚠️ Breaking | Cập nhật lại các hàm override |
+| 3 | Nút report **không tự động focus** khi hiện | ⚠️ Đổi hành vi | Tự gọi focus nếu vẫn muốn focus |
+| 4 | Thêm **Info Button** (view đánh dấu quảng cáo) | Tính năng mới | Tuỳ chọn (`infoButtonId`, mặc định tắt) |
 | 5 | Thêm tham số **`adPendingTime`** cho request | Tính năng mới | Tuỳ chọn |
 | 6 | API xử lý **focus report/skip trên remote TV** | Tính năng mới | Nên wire cho quảng cáo VAST (Welcome/InStream) |
-| 7 | Report gửi kèm **`userId`** trong body (`ReportAdDetail`) | Nội bộ | Không cần làm gì |
-
-> Tham số gửi lên server **giữ nguyên** query param `uid` — chỉ đổi tên biến/builder phía code thành `userId`.
-
 ---
 
 ## 1. ⚠️ Đổi `uid` / `uid20` → `userId`
@@ -47,7 +43,7 @@ Giá trị vẫn được gửi lên server dưới query param `uid` như cũ �
 
 ---
 
-## 2. ⚠️ `BannerAdEventListener` đổi chữ ký
+## 2. ⚠️ `BannerAdEventListener` bổ sung infoButton
 
 Các callback nay có thêm tham số `infoButton: InfoButtonAds?`. Cập nhật lại phần override (Display &
 Overlay Banner):
@@ -75,11 +71,10 @@ DisplayBannerManager.getInstance().addBannerListener(object : BannerAdEventListe
 
 ---
 
-## 3. ⚠️ Nút report không còn tự động focus
+## 3. ⚠️ Nút report không tự động focus
 
-Trước đây `ReportButtonAds.show()` tự gọi `requestFocus()`, khiến nút report **cướp focus** ngay khi
-hiện (gây khó điều khiển bằng remote, nhất là với quảng cáo VAST có nút skip của IMA). Từ 1.1.25, nút
-report hiện lên nhưng **không tự giành focus** — focus giữ ở nút skip.
+Trước đây `ReportButtonAds.show()` tự gọi `requestFocus()`, khiến nút report **lấy focus** ngay khi
+hiện. Từ 1.1.25, nút report hiện lên nhưng **không tự lấy focus** — focus giữ ở nút skip.
 
 Nếu vẫn muốn ép focus vào nút report (chủ động), gọi:
 
@@ -91,11 +86,11 @@ InStreamManager.getInstance().focusReportButton()
 
 ---
 
-## 4. Info Button — thẻ đánh dấu quảng cáo (tuỳ chọn)
+## 4. Info Button — hiển thị thẻ quảng cáo
 
-Info button là một view **không nhận focus**, chỉ để đánh dấu "đây là quảng cáo". Đây là tính năng
+Info button là một view để đánh dấu "đây là quảng cáo". Đây là tính năng
 tuỳ chọn: nếu **không truyền** `infoButtonId` (mặc định `-1`) hoặc không gọi `infoButton?.show()` thì
-thẻ này sẽ không xuất hiện.
+view này sẽ không xuất hiện.
 
 Tạo lớp kế thừa `InfoButtonAds` (giống cách tạo `ReportButtonAds`), override `init(...)` để inflate
 layout của mình:
@@ -116,7 +111,7 @@ Cách dùng theo từng loại:
 - **Welcome / InStream**: truyền thêm `infoButtonId` (Welcome) hoặc `infoButtonAds` (InStream) khi gọi `requestAds`.
 - **Banner**: hiển thị qua `infoButton?.show(...)` trong callback `onShowReportButton`.
 
-> Nếu **không muốn có thẻ đánh dấu quảng cáo** (ví dụ ở Welcome): chỉ cần không truyền `infoButtonId`
+> Nếu **không muốn có view đánh dấu quảng cáo** (ví dụ ở Welcome): chỉ cần không truyền `infoButtonId`
 > (để mặc định `-1`) và không đặt view info button trong layout.
 
 ---
@@ -124,14 +119,14 @@ Cách dùng theo từng loại:
 ## 5. Tham số `adPendingTime` (tuỳ chọn)
 
 Tất cả builder request (`WelcomeAdsRequestData`, `DisplayBannerAdsRequestData`, `AdsRequestData`) có
-thêm `.adPendingTime(Int?)`. Giá trị được gửi lên server dưới query param `apt`.
+thêm `.adPendingTime(Int?)`.
 
 ```kotlin
 AdsRequestData.Builder()
     // ...
     .userId("123123123")
     .userImpressionLimit(5)
-    .adPendingTime(20)     // gửi lên dưới param apt; bỏ qua nếu không dùng
+    .adPendingTime(20)     // MỚi
     .build()
 ```
 
@@ -163,7 +158,7 @@ trả focus về skip IMA. Chỉ áp dụng khi đang dùng nút skip native c�
 
 ### 6.2. InStream Ads
 
-Khác với Welcome, app **tự sở hữu** nút report/skip của InStream nên tự viết logic bắc cầu, dùng API mới
+Khác với Welcome, app **tự quản lý** nút report/skip của InStream nên có thể viết logic bắc cầu, dùng phương thức mới
 của SDK: `InStreamManager.getInstance().focusSkipButton()` (đưa focus về nút skip IMA) và
 `focusReportButton()` (đưa focus sang nút report).
 
@@ -306,14 +301,6 @@ reportButton.nextFocusLeftId = ctlBanner.id      // report -> banner (D-pad trá
 
 ---
 
-## 7. Report gửi kèm `userId` (nội bộ, không cần làm gì)
-
-`ReportAdDetail` (body của `POST /v1/adserving/report`) nay có trường `userId`, lấy từ giá trị `userId`
-đã truyền ở `requestAds`. Đối tác chỉ cần đảm bảo truyền `.userId(...)` khi request quảng cáo là báo cáo
-sẽ có đủ thông tin.
-
----
-
 ## Bảng tham số bổ sung so với 1.1.24
 
 | Tham số | Kiểu | Mô tả |
@@ -331,5 +318,5 @@ sẽ có đủ thông tin.
 - [ ] Cập nhật chữ ký các callback của `BannerAdEventListener` (thêm `infoButton`).
 - [ ] Kiểm tra lại focus: nút report không còn tự focus — wire `dispatchKeyEvent` cho Welcome/InStream nếu dùng VAST (mục 6.1, 6.2).
 - [ ] Wire focus D-pad cho Display/Overlay Banner: container bao banner focusable + `nextFocus` tới nút report (mục 6.3).
-- [ ] (Tuỳ chọn) Thêm Info Button nếu muốn thẻ đánh dấu quảng cáo; hoặc bỏ qua để không hiển thị.
-- [ ] (Tuỳ chọn) Truyền `adPendingTime` nếu cần.
+- [ ] (Tuỳ chọn) Thêm Info Button nếu muốn view đánh dấu quảng cáo; hoặc bỏ qua để không hiển thị.
+- [ ] (Tuỳ chọn) Truyền `adPendingTime`.
