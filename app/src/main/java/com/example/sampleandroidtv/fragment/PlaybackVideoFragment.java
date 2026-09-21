@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.example.sampleandroidtv.R;
 import com.example.sampleandroidtv.activity.DetailsActivity;
 import com.example.sampleandroidtv.model.Movie;
+import com.example.sampleandroidtv.ui.TV360InfoAdsButton;
 import com.example.sampleandroidtv.ui.TV360ReportAdsButton;
 import com.example.sampleandroidtv.ui.TV360SkipAdsButtonAds;
 import com.google.ads.interactivemedia.v3.api.FriendlyObstruction;
@@ -22,6 +23,7 @@ import com.google.ads.interactivemedia.v3.api.FriendlyObstructionPurpose;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
@@ -51,14 +53,22 @@ import java.io.InputStream;
 import java.util.List;
 
 import tv.wiinvent.androidtv.InStreamManager;
+import tv.wiinvent.androidtv.OverlayBannerManager;
+import tv.wiinvent.androidtv.interfaces.banner.BannerAdEventListener;
 import tv.wiinvent.androidtv.logging.LevelLog;
 import tv.wiinvent.androidtv.models.ads.AdInStreamEvent;
 import tv.wiinvent.androidtv.models.ads.AdsRequestData;
+import tv.wiinvent.androidtv.models.ads.DisplayBannerAdsRequestData;
+import tv.wiinvent.androidtv.models.type.BannerDisplayAdSize;
+import tv.wiinvent.androidtv.models.type.BannerDisplayType;
 import tv.wiinvent.androidtv.models.type.ContentType;
 import tv.wiinvent.androidtv.models.type.DeviceType;
 import tv.wiinvent.androidtv.models.type.Environment;
+import tv.wiinvent.androidtv.report.InfoButtonAds;
+import tv.wiinvent.androidtv.report.ReportButtonAds;
 import tv.wiinvent.androidtv.ui.FriendlyPlayerView;
 import tv.wiinvent.androidtv.ui.OverlayView;
+import tv.wiinvent.androidtv.ui.banner.BannerAdView;
 import tv.wiinvent.androidtv.ui.instream.SkipAdsButtonAds;
 
 /** Handles video playback with media controls. */
@@ -71,8 +81,13 @@ public class PlaybackVideoFragment extends Fragment {
   private OverlayView overlayView = null;
   private TV360SkipAdsButtonAds skipButton = null;
   private TV360ReportAdsButton reportButton = null;
+  private View pauseBannerWrapper = null;
+  private BannerAdView pauseBannerView = null;
+  private TV360ReportAdsButton pauseReportButton = null;
+  private TV360InfoAdsButton pauseInfoButton = null;
   private boolean isInStreamAdPlaying = false;
   private boolean isSkipButtonReady = false; // 1.1.26: nút skip đã bấm được (hết đếm ngược) hay chưa
+  private boolean isPauseAdRequested = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +108,10 @@ public class PlaybackVideoFragment extends Fragment {
     skipButton = requireActivity().findViewById(R.id.skip_button);
     reportButton = requireActivity().findViewById(R.id.instream_report_button);
     overlayView = requireActivity().findViewById(R.id.wisdk_overlay_view);
+    pauseBannerWrapper = requireActivity().findViewById(R.id.pause_banner_overlay_wrapper);
+    pauseBannerView = requireActivity().findViewById(R.id.pause_banner_view);
+    pauseReportButton = requireActivity().findViewById(R.id.pause_banner_report_button);
+    pauseInfoButton = requireActivity().findViewById(R.id.pause_banner_info_button);
     init(savedInstanceState);
   }
 
@@ -148,6 +167,8 @@ public class PlaybackVideoFragment extends Fragment {
   @Override
   public void onDestroy() {
     super.onDestroy();
+    dismissPauseAd();
+    OverlayBannerManager.Companion.getInstance().release();
     InStreamManager.Companion.getInstance().release();
     if (exoPlayer != null) {
       exoPlayer.release();
@@ -164,11 +185,23 @@ public class PlaybackVideoFragment extends Fragment {
   private void initializePlayer() {
     //1. Khởi tạo InStreamManager
     InStreamManager.Companion.getInstance().init(requireContext(), "14", DeviceType.TV, Environment.SANDBOX, 5, 10, 5, 2500, LevelLog.BODY, 8);
+    initOverlayBannerManager();
 
     String userAgent = Util.getUserAgent(requireContext(), "Exo");
 
     exoPlayer = new ExoPlayer.Builder(requireContext()).build();
     playerView.setPlayer(exoPlayer);
+    exoPlayer.addListener(new Player.Listener() {
+      @Override
+      public void onPlaybackStateChanged(int playbackState) {
+        handlePauseAdState();
+      }
+
+      @Override
+      public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
+        handlePauseAdState();
+      }
+    });
 
     //2. Thêm WiAdsLoaderListener
     InStreamManager.Companion.getInstance().setLoaderListener(new InStreamManager.WiAdsLoaderListener() {
@@ -293,6 +326,107 @@ public class PlaybackVideoFragment extends Fragment {
     exoPlayer.addMediaSource(adsMediaSource);
     exoPlayer.prepare();
     exoPlayer.setPlayWhenReady(true);
+  }
+
+  private void initOverlayBannerManager() {
+    OverlayBannerManager.Companion.getInstance().init(requireContext(), "14", Environment.SANDBOX, 10, true);
+    OverlayBannerManager.Companion.getInstance().addBannerListener(new BannerAdEventListener() {
+      @Override
+      public void onDisplayAds(String positionId, BannerAdView adView, ReportButtonAds reportButton, InfoButtonAds infoButton) {
+        if (getActivity() == null) return;
+        getActivity().runOnUiThread(() -> {
+          if (pauseBannerWrapper != null) pauseBannerWrapper.setVisibility(View.VISIBLE);
+          if (adView != null) adView.setVisibility(View.VISIBLE);
+        });
+      }
+
+      @Override
+      public void onNoAds(String positionId, BannerAdView adView) {
+        isPauseAdRequested = false;
+        if (getActivity() != null) getActivity().runOnUiThread(() -> {
+          if (adView != null) adView.setVisibility(View.GONE);
+          if (pauseBannerWrapper != null) pauseBannerWrapper.setVisibility(View.GONE);
+        });
+      }
+
+      @Override
+      public void onAdsBannerDismiss(String positionId, BannerAdView adView, ReportButtonAds reportButton, InfoButtonAds infoButton) {
+        if (getActivity() != null) getActivity().runOnUiThread(() -> releasePauseBanner(adView, reportButton, infoButton));
+      }
+
+      @Override
+      public void onAdsBannerError(String positionId, BannerAdView adView, ReportButtonAds reportButton, InfoButtonAds infoButton) {
+        if (getActivity() != null) getActivity().runOnUiThread(() -> releasePauseBanner(adView, reportButton, infoButton));
+      }
+
+      @Override
+      public void onAdsBannerClick(String positionId, String clickThroughLink) {
+        Log.d(TAG, "=========OverlayBannerManager onAdsBannerClick " + positionId + " " + clickThroughLink);
+      }
+
+      @Override
+      public void onShowReportButton(String positionId, ReportButtonAds reportButton, InfoButtonAds infoButton) {
+        if (reportButton != null) reportButton.show(getActivity());
+        if (infoButton != null) infoButton.show(getActivity());
+      }
+
+      @Override
+      public void onHideReportButton(String positionId, ReportButtonAds reportButton, InfoButtonAds infoButton) {
+        if (reportButton != null) reportButton.hide();
+        if (infoButton != null) infoButton.hide();
+      }
+    });
+  }
+
+  private void handlePauseAdState() {
+    if (exoPlayer == null || exoPlayer.getPlaybackState() != Player.STATE_READY) return;
+    if (exoPlayer.getPlayWhenReady()) {
+      dismissPauseAd();
+    } else if (!isInStreamAdPlaying) {
+      showPauseAd();
+    }
+  }
+
+  private void showPauseAd() {
+    if (isPauseAdRequested || pauseBannerView == null || getActivity() == null) return;
+    isPauseAdRequested = true;
+
+    DisplayBannerAdsRequestData requestData = new DisplayBannerAdsRequestData.Builder()
+        .adSize(BannerDisplayAdSize.PAUSE_BANNER)
+        .bannerDisplayType(BannerDisplayType.OVERLAY)
+        .channelId("998989,222222")
+        .streamId("7600")
+        .contentType(ContentType.FILM)
+        .title("Tieu de cua noi dung")
+        .category("category 1, category 2")
+        .transId("222222")
+        .userId("123123123")
+        .userImpressionLimit(5)
+        .segments("123,1,23")
+        .positionId("pause")
+        .color("#ffffff00")
+        .adPendingTime(20)
+        .build();
+
+    OverlayBannerManager.Companion.getInstance().requestAds(
+        getActivity(),
+        pauseBannerView,
+        requestData,
+        2L,
+        pauseReportButton,
+        pauseInfoButton);
+  }
+
+  private void dismissPauseAd() {
+    if (!isPauseAdRequested) return;
+    releasePauseBanner(pauseBannerView, pauseReportButton, pauseInfoButton);
+  }
+
+  private void releasePauseBanner(BannerAdView adView, ReportButtonAds reportButton, InfoButtonAds infoButton) {
+    isPauseAdRequested = false;
+    if (adView != null) adView.setVisibility(View.GONE);
+    if (pauseBannerWrapper != null) pauseBannerWrapper.setVisibility(View.GONE);
+    OverlayBannerManager.Companion.getInstance().releaseBanner(adView, reportButton, infoButton);
   }
 
   private DrmSessionManager getDrmSessionManager(DefaultHttpDataSource.Factory dataSourceFactory) {
