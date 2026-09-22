@@ -81,7 +81,6 @@ public class PlaybackVideoFragment extends Fragment {
   private OverlayView overlayView = null;
   private TV360SkipAdsButtonAds skipButton = null;
   private TV360ReportAdsButton reportButton = null;
-  private View pauseBannerWrapper = null;
   private BannerAdView pauseBannerView = null;
   private TV360ReportAdsButton pauseReportButton = null;
   private TV360InfoAdsButton pauseInfoButton = null;
@@ -108,7 +107,6 @@ public class PlaybackVideoFragment extends Fragment {
     skipButton = requireActivity().findViewById(R.id.skip_button);
     reportButton = requireActivity().findViewById(R.id.instream_report_button);
     overlayView = requireActivity().findViewById(R.id.wisdk_overlay_view);
-    pauseBannerWrapper = requireActivity().findViewById(R.id.pause_banner_overlay_wrapper);
     pauseBannerView = requireActivity().findViewById(R.id.pause_banner_view);
     pauseReportButton = requireActivity().findViewById(R.id.pause_banner_report_button);
     pauseInfoButton = requireActivity().findViewById(R.id.pause_banner_info_button);
@@ -335,18 +333,14 @@ public class PlaybackVideoFragment extends Fragment {
       public void onDisplayAds(String positionId, BannerAdView adView, ReportButtonAds reportButton, InfoButtonAds infoButton) {
         if (getActivity() == null) return;
         getActivity().runOnUiThread(() -> {
-          if (pauseBannerWrapper != null) pauseBannerWrapper.setVisibility(View.VISIBLE);
           if (adView != null) adView.setVisibility(View.VISIBLE);
         });
       }
 
       @Override
       public void onNoAds(String positionId, BannerAdView adView) {
-        isPauseAdRequested = false;
-        if (getActivity() != null) getActivity().runOnUiThread(() -> {
-          if (adView != null) adView.setVisibility(View.GONE);
-          if (pauseBannerWrapper != null) pauseBannerWrapper.setVisibility(View.GONE);
-        });
+        Log.d(TAG, "=========OverlayBannerManager khong co ads de show " + positionId);
+        if (getActivity() != null) getActivity().runOnUiThread(() -> releasePauseBanner(adView, pauseReportButton, pauseInfoButton));
       }
 
       @Override
@@ -394,17 +388,17 @@ public class PlaybackVideoFragment extends Fragment {
     DisplayBannerAdsRequestData requestData = new DisplayBannerAdsRequestData.Builder()
         .adSize(BannerDisplayAdSize.PAUSE_BANNER)
         .bannerDisplayType(BannerDisplayType.OVERLAY)
-        .channelId("998989,222222")
-        .streamId("7600")
+        .channelId("998989")
+        .streamId("999999")
         .contentType(ContentType.FILM)
-        .title("Tieu de cua noi dung")
+        .title("Day la title")
         .category("category 1, category 2")
-        .transId("222222")
+        .transId("1112222222")
         .userId("123123123")
         .userImpressionLimit(5)
-        .segments("123,1,23")
-        .positionId("pause")
         .color("#ffffff00")
+        .segments("a3,34,d3,d3")
+        .positionId("")
         .adPendingTime(20)
         .build();
 
@@ -425,7 +419,6 @@ public class PlaybackVideoFragment extends Fragment {
   private void releasePauseBanner(BannerAdView adView, ReportButtonAds reportButton, InfoButtonAds infoButton) {
     isPauseAdRequested = false;
     if (adView != null) adView.setVisibility(View.GONE);
-    if (pauseBannerWrapper != null) pauseBannerWrapper.setVisibility(View.GONE);
     OverlayBannerManager.Companion.getInstance().releaseBanner(adView, reportButton, infoButton);
   }
 

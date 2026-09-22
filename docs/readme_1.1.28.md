@@ -69,7 +69,12 @@ OverlayBannerManager.getInstance().addBannerListener(object : BannerAdEventListe
     }
 
     override fun onNoAds(positionId: String, adView: BannerAdView?) {
-        // Không có quảng cáo pause để hiển thị.
+        // Không có quảng cáo pause: vẫn phải ẩn banner và reset cờ đã request,
+        // nếu không lớp phủ rỗng sẽ nằm lại trên player.
+        activity?.runOnUiThread {
+            adView?.visibility = View.GONE
+            OverlayBannerManager.getInstance().releaseBanner(adView, reportButton, infoButton)
+        }
     }
 
     override fun onAdsBannerDismiss(
@@ -124,20 +129,55 @@ OverlayBannerManager.getInstance().addBannerListener(object : BannerAdEventListe
 
 ## 3. Layout cho Pause Ad
 
-Đặt `BannerAdView` overlay cùng vùng player. Nếu dùng report/info button, đặt các view này trong cùng
-container để SDK có thể đưa button lên trên banner.
+Điểm dễ sai nhất của pause ad. Khi có quảng cáo, SDK **ghi đè `layoutParams` của `BannerAdView`**
+thành match 4 cạnh của **parent**, rồi tự đặt creative bên trong theo loại banner backend trả về:
 
-Ví dụ:
+| `bannerAdSize` | Vị trí / kích thước creative (so với `BannerAdView`) |
+|---|---|
+| `PAUSE_LARGE_BANNER` | rộng 80%, bám đáy |
+| `CENTER_BANNER` | rộng 40%, canh giữa |
+| `TRANSPARENT_BANNER` | cao 70%, bám phải |
+
+Chiều cao (hoặc rộng) còn lại suy ra theo `dimensionRatio` của creative. Hệ quả cho app đối tác:
+
+- Mọi constraint đặt trên chính `BannerAdView` trong XML đều **bị bỏ** khi ads về. Không dùng
+  `BannerAdView` để định vị vùng quảng cáo được.
+- Phải bọc `BannerAdView` trong một `ConstraintLayout` **wrapper** và constraint wrapper vào đúng
+  vùng player. SDK tự lo tỉ lệ và vị trí, wrapper chỉ cần phủ đúng vùng player.
+- **Wrapper bắt buộc có kích thước xác định**: `layout_width="0dp"` + `layout_height="0dp"` +
+  constraint đủ 4 cạnh. Dùng `wrap_content` sẽ tạo vòng lặp với con `0dp` mà SDK set, ConstraintLayout
+  resolve ra chiều cao ~0 và **banner bị bẹp còn vài pixel**.
+
+Hai điểm bắt buộc còn lại:
+
+1. `ReportButtonAds` / `InfoButtonAds` phải là **con trực tiếp của `BannerAdView`** — SDK constraint
+   hai nút này vào creative (`topToTop` / `endToEnd` của ảnh quảng cáo) khi runtime. Đặt ra ngoài
+   `BannerAdView` thì constraint không resolve được và nút sẽ nằm sai vị trí.
+2. Trong XML **không tự constraint** hai nút vào `BannerAdView` (kể cả bằng chính id của nó — đó là
+   parent, ConstraintLayout không resolve id parent từ con). Chỉ khai báo kích thước và margin.
+
+Để `BannerAdView` ở `visibility="gone"`, chỉ bật `VISIBLE` trong `onDisplayAds`. Nếu để `visible`
+sẵn, một lớp phủ rỗng nằm trên player suốt thời gian phát.
+
+Về `focusable` của wrapper, tuỳ màn hình:
+
+- Màn hình chỉ có overlay/pause ad (có `PlayerControlView` để điều hướng): set `focusable`,
+  `focusableInTouchMode`, `descendantFocusability="beforeDescendants"` cho wrapper để bắc cầu focus
+  giữa control player và nút report — xem `fragment_overlay_banner.xml` trong sample.
+- Màn hình player full-screen có **kèm quảng cáo InStream**: **không** set `focusable` cho wrapper.
+  Một wrapper focusable phủ kín player sẽ ăn focus D-pad của nút skip/report InStream.
+
+Ví dụ (player full-screen):
 
 ```xml
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:id="@+id/banner_overlay_wrapper"
+    android:id="@+id/pause_banner_overlay_wrapper"
     android:layout_width="0dp"
     android:layout_height="0dp"
-    app:layout_constraintTop_toTopOf="@id/video_frame"
-    app:layout_constraintBottom_toBottomOf="@id/video_frame"
-    app:layout_constraintStart_toStartOf="@id/video_frame"
-    app:layout_constraintEnd_toEndOf="@id/video_frame">
+    app:layout_constraintTop_toTopOf="@id/simple_exo_player_view"
+    app:layout_constraintBottom_toBottomOf="@id/simple_exo_player_view"
+    app:layout_constraintStart_toStartOf="@id/simple_exo_player_view"
+    app:layout_constraintEnd_toEndOf="@id/simple_exo_player_view">
 
     <tv.wiinvent.androidtv.ui.banner.BannerAdView
         android:id="@+id/pause_banner_view"
@@ -153,17 +193,16 @@ Ví dụ:
             android:id="@+id/pause_report_button"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="3dp"
+            android:focusable="true"
+            android:visibility="gone" />
 
         <com.partner.app.ui.PartnerInfoAdsButton
             android:id="@+id/pause_info_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:visibility="gone" />
 
     </tv.wiinvent.androidtv.ui.banner.BannerAdView>
 
@@ -336,11 +375,28 @@ App có thể thay `KEYCODE_DPAD_UP/DOWN` bằng hướng điều hướng phù 
 
 ---
 
-## 8. Checklist tích hợp
+## 8. Lỗi thường gặp
+
+| Triệu chứng | Nguyên nhân | Cách sửa |
+|---|---|---|
+| Banner bị **bẹp** còn vài pixel chiều cao | Wrapper để `wrap_content`, trong khi SDK set `BannerAdView` thành `0dp` (MATCH_CONSTRAINT) bám 4 cạnh parent → vòng lặp, resolve ra ~0 | Wrapper phải `layout_width="0dp"` + `layout_height="0dp"` + constraint đủ 4 cạnh |
+| Banner **hẹp / lệch tâm**, không đúng tỉ lệ | Wrapper tự giới hạn bằng `layout_constraintWidth_percent` hoặc margin | Bỏ hết; SDK đã tự set % theo loại banner, wrapper chỉ cần phủ đúng vùng player |
+| Banner **phủ gần kín** player | Wrapper phủ vùng lớn hơn player (hoặc constraint vào `parent` thay vì player) | Constraint wrapper vào đúng view player |
+| Nút report/info **lệch vị trí** hoặc sai kích thước | Hai nút đặt ngoài `BannerAdView`; SDK constraint chúng vào id của **ảnh creative**, chỉ resolve được giữa sibling | Đưa hai nút vào làm **con trực tiếp** của `BannerAdView`, XML chỉ khai báo size + margin |
+| Lớp phủ trong suốt che player khi **không có** quảng cáo | `BannerAdView` để `visibility="visible"`, hoặc `onNoAds` không ẩn banner | Để `gone` trong XML, bật VISIBLE ở `onDisplayAds`, gọi `releaseBanner` trong `onNoAds` |
+| Remote không bấm được nút skip InStream | Wrapper `focusable` phủ kín player full-screen | Bỏ `focusable` trên wrapper ở màn hình có InStream (xem mục 3) |
+
+---
+
+## 9. Checklist tích hợp
 
 - [ ] Cập nhật dependency SDK lên `1.1.28`.
 - [ ] Khởi tạo `OverlayBannerManager` trong màn hình player.
-- [ ] Thêm `BannerAdView`, `ReportButtonAds`, `InfoButtonAds` vào vùng overlay của player.
+- [ ] Bọc `BannerAdView` trong wrapper `ConstraintLayout` có kích thước xác định (`0dp` + đủ 4 cạnh),
+      constraint vào đúng vùng player; không dùng `wrap_content` / `width_percent` cho wrapper.
+- [ ] Đặt `ReportButtonAds`, `InfoButtonAds` làm **con trực tiếp** của `BannerAdView`, XML không tự
+      constraint hai nút này.
+- [ ] `BannerAdView` để `visibility="gone"`, chỉ bật VISIBLE trong `onDisplayAds`.
 - [ ] Request pause ad với `BannerDisplayAdSize.PAUSE_BANNER` và `BannerDisplayType.OVERLAY`.
 - [ ] Gọi `showPauseAd()` khi ExoPlayer `STATE_READY && !playWhenReady`.
 - [ ] Gọi `dismissPauseAd()` khi ExoPlayer resume hoặc rời màn hình.

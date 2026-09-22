@@ -1,5 +1,14 @@
 
 ### Hướng dẫn tích hợp quảng cáo Instream phương án TVC quảng cáo và nội dung chạy chung player
+
+> Tài liệu này hướng dẫn quảng cáo **Instream**. Các sản phẩm quảng cáo khác có tài liệu riêng theo
+> phiên bản trong thư mục [docs/](docs/):
+> - Quảng cáo **Pause / Overlay banner** (`OverlayBannerManager`): [docs/readme_1.1.28.md](docs/readme_1.1.28.md)
+>   — đọc kỹ mục 3 (layout) và mục 8 (lỗi thường gặp), đây là phần dễ tích hợp sai nhất.
+>
+> Phiên bản SDK hiện tại của sample xem ở `app/build.gradle`; các snippet trong tài liệu này có thể
+> còn ghi phiên bản cũ hơn.
+
 #### 1. Thêm Repository
 Bổ sung config sau đây vào file `build.gradle` ở thư mục gốc của project.
 
