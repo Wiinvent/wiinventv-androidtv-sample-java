@@ -1,6 +1,6 @@
-# Wiinvent SDK Android TV v1.1.28 — Hướng dẫn tích hợp quảng cáo Pause
+# Wiinvent SDK Android TV v1.1.28-2.16 — Hướng dẫn tích hợp quảng cáo Pause
 
-Tài liệu này mô tả phần tích hợp **quảng cáo Pause** trong SDK Wiinvent Android TV **1.1.28** để đối tác
+Tài liệu này mô tả phần tích hợp **quảng cáo Pause** trong SDK Wiinvent Android TV **1.1.28-2.16** để đối tác
 hiển thị banner khi người dùng tạm dừng nội dung video.
 
 Nếu đang tích hợp mới hoàn toàn, đọc kèm:
@@ -12,7 +12,7 @@ Nếu đang tích hợp mới hoàn toàn, đọc kèm:
 Dependency:
 
 ```gradle
-implementation 'tv.wiinvent:wiinvent-sdk-android-tv:1.1.28'
+implementation 'tv.wiinvent:wiinvent-sdk-android-tv:1.1.28-2.16'
 implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
 implementation 'com.google.android.exoplayer:extension-ima:2.19.1'
 ```
@@ -390,7 +390,7 @@ App có thể thay `KEYCODE_DPAD_UP/DOWN` bằng hướng điều hướng phù 
 
 ## 9. Checklist tích hợp
 
-- [ ] Cập nhật dependency SDK lên `1.1.28`.
+- [ ] Cập nhật dependency SDK lên `1.1.28-2.16`.
 - [ ] Khởi tạo `OverlayBannerManager` trong màn hình player.
 - [ ] Bọc `BannerAdView` trong wrapper `ConstraintLayout` có kích thước xác định (`0dp` + đủ 4 cạnh),
       constraint vào đúng vùng player; không dùng `wrap_content` / `width_percent` cho wrapper.
